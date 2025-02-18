@@ -1,44 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { BrowserRouter, Route, Routes } from "react-router";
 
-interface Driver {
-  name: string;
-  id: number;
-  createdAt: Date;
-  updatedAt: Date | null;
-}
-
-const getDrivers = async () => {
-  const response = await axios.get("http://localhost:8080/api/drivers");
-  return response.data.data;
-};
+import Dashboard from "./dashboard";
+import Home from "./home";
+import Login from "./login";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
-  const {
-    data: drivers,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["driversData"],
-    queryFn: getDrivers,
-  });
-
-  if (isLoading) {
-    return <div>Fetching posts...</div>;
-  }
-
-  if (error) {
-    return <div>An error occurred: {error.message}</div>;
-  }
-
   return (
     <>
-      <div>Drivers</div>
-      <ul>
-        {drivers.map((driver: Driver) => (
-          <li key={driver.id}>{driver.name}</li>
-        ))}
-      </ul>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="dashboard" element={<Dashboard />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
