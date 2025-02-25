@@ -1,7 +1,7 @@
 import { usePulsy } from "pulsy";
 import { useNavigate } from "react-router";
 
-import { logout } from "./authService";
+import { logout } from "./auth-service";
 
 export default function Dashboard() {
   const [auth] = usePulsy<{ user: string }>("auth");

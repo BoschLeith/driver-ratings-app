@@ -41,7 +41,7 @@ function Home() {
 
   if (isLoading) return <div>Fetching results...</div>;
   if (error) return <div>An error occurred: {error.message}</div>;
-  if (!races) return <div>No data found</div>;
+  if (!races || races.data.length === 0) return <div>No data found</div>;
 
   const getAllRaterNames = (drivers: Driver[]): string[] => {
     const raterNames = new Set<string>();

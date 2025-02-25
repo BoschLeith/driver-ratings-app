@@ -2,7 +2,7 @@ import usePulsy from "pulsy";
 import { ReactNode, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 
-import { logout, validateToken } from "./authService";
+import { logout, validateToken } from "./auth-service";
 
 interface ProtectedRouteProps {
   children?: ReactNode;
