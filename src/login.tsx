@@ -25,22 +25,32 @@ export default function Login() {
         <div className="card-body">
           <h2 className="card-title">Login</h2>
           <form onSubmit={handleLogin} className="grid gap-4">
-            <input
-              className="input"
-              type="email"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Username"
-              required
-            />
-            <input
-              className="input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              required
-            />
+            <label className="floating-label" htmlFor="email">
+              <span>Email</span>
+              <input
+                className="input"
+                id="email"
+                type="email"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+                required
+                autoComplete="email"
+              />
+            </label>
+            <label className="floating-label" htmlFor="password">
+              <span>Password</span>
+              <input
+                className="input"
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+                autoComplete="current-password"
+              />
+            </label>
             <button className="btn btn-block" type="submit">
               Login
             </button>
