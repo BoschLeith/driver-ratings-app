@@ -44,7 +44,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }, [auth?.token, navigate]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="loading loading-spinner loading-xl"></span>
+      </div>
+    );
   }
 
   return children ? children : <Outlet />;
