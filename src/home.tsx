@@ -8,7 +8,7 @@ interface Rating {
 
 interface Driver {
   id: number;
-  name: string;
+  driverCode: string;
   ratings: Rating[];
 }
 
@@ -71,7 +71,7 @@ function Home() {
               <tbody>
                 {race.drivers.map((driver) => (
                   <tr key={driver.id}>
-                    <td>{driver.name}</td>
+                    <td>{driver.driverCode}</td>
                     {raterNames.map((raterName) => {
                       const rating = driver.ratings.find(
                         (r) => r.raterName === raterName
