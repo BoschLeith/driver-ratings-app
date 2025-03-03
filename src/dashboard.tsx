@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { DateTime } from "luxon";
 import { usePulsy } from "pulsy";
@@ -25,6 +25,38 @@ interface Driver {
   updatedAt: string | null;
 }
 
+interface Rater {
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+interface Team {
+  id: number;
+  name: string;
+  fullName: string;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+interface InsertResult {
+  driverId: number;
+  teamId: number;
+  raceId: number;
+  position: number;
+}
+
+interface InsertRating {
+  resultId: number;
+  raterId: number;
+  rating: number;
+}
+
+interface InsertedResult {
+  id: number;
+}
+
 interface ApiResponse<T> {
   success: boolean;
   data: T[];
@@ -48,6 +80,57 @@ const getDrivers = async () => {
   const response = await axios.get<ApiResponse<Driver>>(
     "http://localhost:8080/api/drivers"
   );
+  return response.data;
+};
+
+const getRaters = async () => {
+  const response = await axios.get<ApiResponse<Rater>>(
+    "http://localhost:8080/api/raters"
+  );
+  return response.data;
+};
+
+const getTeams = async () => {
+  const response = await axios.get<ApiResponse<Team>>(
+    "http://localhost:8080/api/teams"
+  );
+  return response.data;
+};
+
+// TODO: Check if pulsyAuth is null
+const insertResult = async (data: InsertResult) => {
+  const pulsyAuth = localStorage.getItem("pulsy_auth");
+  const parsedAuth = JSON.parse(pulsyAuth!);
+
+  const token = parsedAuth.value.token;
+
+  console.log(token);
+
+  const response = await axios.post<ApiResponse<InsertedResult>>(
+    "http://localhost:8080/api/results",
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+const insertRating = async (data: InsertRating[]) => {
+  const pulsyAuth = localStorage.getItem("pulsy_auth");
+  const parsedAuth = JSON.parse(pulsyAuth!);
+
+  const token = parsedAuth.value.token;
+
+  console.log(token);
+
+  const response = await axios.post("http://localhost:8080/api/ratings", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
 
@@ -94,7 +177,10 @@ export default function Dashboard() {
     null
   );
   const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
+  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   const [selectedDriverId, setSelectedDriverId] = useState<number | null>(null);
+  const [ratings, setRatings] = useState<{ [key: number]: number }>({});
+  const [selectedPosition, setSelectedPosition] = useState<number>();
 
   const {
     data: grandPrixs,
@@ -127,6 +213,67 @@ export default function Dashboard() {
     queryFn: getDrivers,
     enabled: !!selectedGrandPrixId && !!selectedRaceId,
   });
+
+  const {
+    data: raters,
+    error: ratersError,
+    isLoading: isLoadingRaters,
+  } = useQuery({
+    queryKey: ["ratersData"],
+    queryFn: getRaters,
+    enabled: !!selectedGrandPrixId && !!selectedRaceId,
+  });
+
+  const {
+    data: teams,
+    error: teamsError,
+    isLoading: isLoadingTeams,
+  } = useQuery({
+    queryKey: ["teamsData"],
+    queryFn: getTeams,
+    enabled: !!selectedGrandPrixId && !!selectedRaceId,
+  });
+
+  const mutation = useMutation({
+    mutationFn: insertResult,
+    onSuccess: (data) => {
+      data.data.map((result) => {
+        const ratingsArray: InsertRating[] = Object.entries(ratings).map(
+          ([raterId, rating]) => ({
+            resultId: result.id,
+            raterId: Number(raterId),
+            rating,
+          })
+        );
+        insertRating(ratingsArray);
+      });
+    },
+    onError: (error: any) => {
+      console.error("Error inserting data:", error);
+    },
+  });
+
+  const handleInputChange = (raterId: number, value: number) => {
+    setRatings((prevRatings) => ({
+      ...prevRatings,
+      [raterId]: value,
+    }));
+  };
+
+  const handlePositionChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPosition(Number(event.target.value));
+  };
+
+  // TODO: Add Validation
+  const handleClick = () => {
+    const newData = {
+      driverId: selectedDriverId!,
+      teamId: selectedTeamId!,
+      raceId: selectedRaceId!,
+      position: selectedPosition!,
+    };
+    mutation.mutate(newData);
+  };
 
   return (
     <>
@@ -184,6 +331,21 @@ export default function Dashboard() {
         </fieldset>
 
         <fieldset className="fieldset">
+          <legend className="fieldset-legend">Position</legend>
+          <select
+            className="select"
+            value={selectedPosition}
+            onChange={handlePositionChange}
+          >
+            {Array.from({ length: 20 }, (_, index) => (
+              <option key={index + 1} value={index + 1}>
+                {index + 1}
+              </option>
+            ))}
+          </select>
+        </fieldset>
+
+        <fieldset className="fieldset">
           <legend className="fieldset-legend">Driver</legend>
           <Select
             value={selectedDriverId}
@@ -206,9 +368,64 @@ export default function Dashboard() {
           )}
         </fieldset>
 
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Teams</legend>
+          <Select
+            value={selectedTeamId}
+            onChange={(e) => setSelectedTeamId(Number(e.target.value))}
+            options={
+              isLoadingTeams
+                ? [{ id: -1, label: "Loading teams..." }]
+                : teams?.data.map((team) => ({
+                    id: team.id,
+                    label: team.name,
+                  })) ?? []
+            }
+            placeholder="Pick a Team"
+            disabled={!selectedGrandPrixId || !selectedRaceId}
+          />
+          {teamsError && (
+            <div className="fieldset-label text-error">
+              {teamsError.message}
+            </div>
+          )}
+        </fieldset>
+
+        {ratersError && (
+          <div className="fieldset-label text-error">{ratersError.message}</div>
+        )}
+        {isLoadingRaters && (
+          <div className="fieldset-label">Loading raters...</div>
+        )}
+        {raters?.data.map((rater) => (
+          <fieldset className="fieldset" key={rater.id}>
+            <legend className="fieldset-legend">{rater.name}</legend>
+            <input
+              type="number"
+              className="input"
+              placeholder="Rating"
+              value={ratings[rater.id] || ""}
+              onChange={(e) =>
+                handleInputChange(rater.id, Number(e.target.value))
+              }
+            />
+          </fieldset>
+        ))}
+
         {selectedGrandPrixId && <div>Grand Prix Id: {selectedGrandPrixId}</div>}
         {selectedRaceId && <div>Race Id: {selectedRaceId}</div>}
+        {selectedPosition && <div>Position: {selectedPosition}</div>}
         {selectedDriverId && <div>Driver Id: {selectedDriverId}</div>}
+        {selectedTeamId && <div>Team Id: {selectedTeamId}</div>}
+        {Object.entries(ratings).map(([raterId, rating]) => (
+          <div key={raterId}>
+            Rater ID: {raterId}, Rating: {rating}
+          </div>
+        ))}
+
+        <button onClick={handleClick} disabled={mutation.isPending}>
+          {mutation.isPending ? "Inserting..." : "Insert Data"}
+        </button>
       </div>
     </>
   );
