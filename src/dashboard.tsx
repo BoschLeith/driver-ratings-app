@@ -4,18 +4,18 @@ import { DateTime } from "luxon";
 import { usePulsy } from "pulsy";
 import { ChangeEvent, useState } from "react";
 
+import DriverSelect from "./components/driver-select";
+import PositionSelect from "./components/position-select";
 import {
   ApiResponse,
   GrandPrix,
-  Race,
-  Driver,
-  Rater,
-  Team,
-  InsertResult,
   InsertedResult,
   InsertRating,
+  InsertResult,
+  Race,
+  Rater,
+  Team,
 } from "./types";
-import PositionSelect from "./components/position-select";
 
 const getGrandPrixs = async () => {
   const response = await axios.get<ApiResponse<GrandPrix>>(
@@ -27,13 +27,6 @@ const getGrandPrixs = async () => {
 const getGrandPrixRaces = async (grandPrixId: number) => {
   const response = await axios.get<ApiResponse<Race>>(
     `http://localhost:8080/api/grandPrixs/${grandPrixId}/races`
-  );
-  return response.data;
-};
-
-const getDrivers = async () => {
-  const response = await axios.get<ApiResponse<Driver>>(
-    "http://localhost:8080/api/drivers"
   );
   return response.data;
 };
@@ -133,9 +126,9 @@ export default function Dashboard() {
   );
   const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
-  const [selectedDriverId, setSelectedDriverId] = useState<number | null>(null);
   const [ratings, setRatings] = useState<{ [key: number]: number }>({});
   const [position, setPosition] = useState<number | undefined>(undefined);
+  const [driverId, setDriverId] = useState<number | null>(null);
 
   const {
     data: grandPrixs,
@@ -157,16 +150,6 @@ export default function Dashboard() {
         ? getGrandPrixRaces(selectedGrandPrixId)
         : Promise.resolve({ success: false, data: [] }),
     enabled: !!selectedGrandPrixId,
-  });
-
-  const {
-    data: drivers,
-    error: driversError,
-    isLoading: isLoadingDrivers,
-  } = useQuery({
-    queryKey: ["driversData"],
-    queryFn: getDrivers,
-    enabled: !!selectedGrandPrixId && !!selectedRaceId,
   });
 
   const {
@@ -219,10 +202,14 @@ export default function Dashboard() {
     setPosition(newPosition);
   };
 
+  const handleDriverSelect = (driverId: number | null) => {
+    setDriverId(driverId);
+  };
+
   // TODO: Add Validation
   const handleClick = () => {
     const newData = {
-      driverId: selectedDriverId!,
+      driverId: driverId!,
       teamId: selectedTeamId!,
       raceId: selectedRaceId!,
       position: position!,
@@ -287,28 +274,7 @@ export default function Dashboard() {
 
         <PositionSelect onPositionChange={handlePositionChange} />
 
-        <fieldset className="fieldset">
-          <legend className="fieldset-legend">Driver</legend>
-          <Select
-            value={selectedDriverId}
-            onChange={(e) => setSelectedDriverId(Number(e.target.value))}
-            options={
-              isLoadingDrivers
-                ? [{ id: -1, label: "Loading drivers..." }]
-                : drivers?.data.map((driver) => ({
-                    id: driver.id,
-                    label: `${driver.firstName} ${driver.lastName}`,
-                  })) ?? []
-            }
-            placeholder="Pick a Driver"
-            disabled={!selectedGrandPrixId || !selectedRaceId}
-          />
-          {driversError && (
-            <div className="fieldset-label text-error">
-              {driversError.message}
-            </div>
-          )}
-        </fieldset>
+        <DriverSelect onDriverSelect={handleDriverSelect} />
 
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Teams</legend>
@@ -357,7 +323,7 @@ export default function Dashboard() {
         {selectedGrandPrixId && <div>Grand Prix Id: {selectedGrandPrixId}</div>}
         {selectedRaceId && <div>Race Id: {selectedRaceId}</div>}
         {position && <div>Position: {position}</div>}
-        {selectedDriverId && <div>Driver Id: {selectedDriverId}</div>}
+        {driverId && <div>Driver Id: {driverId}</div>}
         {selectedTeamId && <div>Team Id: {selectedTeamId}</div>}
         {Object.entries(ratings).map(([raterId, rating]) => (
           <div key={raterId}>
