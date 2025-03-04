@@ -1,18 +1,18 @@
 import { ChangeEvent, useState } from "react";
 
 interface PositionSelectProps {
-  onPositionChange: (position: number) => void;
+  onPositionSelect: (position: number | null) => void;
 }
 
 export default function PositionSelect({
-  onPositionChange,
+  onPositionSelect,
 }: PositionSelectProps) {
-  const [selectedPosition, setSelectedPosition] = useState<number>(1);
+  const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
 
   const handlePositionChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const newPosition = Number(event.target.value);
     setSelectedPosition(newPosition);
-    onPositionChange(newPosition);
+    onPositionSelect(newPosition);
   };
 
   const positionOptions = [];
@@ -29,9 +29,12 @@ export default function PositionSelect({
       <legend className="fieldset-legend">Position</legend>
       <select
         className="select"
-        value={selectedPosition}
+        value={selectedPosition || ""}
         onChange={handlePositionChange}
       >
+        <option value="" disabled>
+          Select a position
+        </option>
         {positionOptions}
       </select>
     </fieldset>
