@@ -4,63 +4,18 @@ import { DateTime } from "luxon";
 import { usePulsy } from "pulsy";
 import { ChangeEvent, useState } from "react";
 
-interface GrandPrix {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-interface Race {
-  id: number;
-  date: string;
-}
-
-interface Driver {
-  id: number;
-  firstName: string;
-  lastName: string;
-  driverCode: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-interface Rater {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-interface Team {
-  id: number;
-  name: string;
-  fullName: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-interface InsertResult {
-  driverId: number;
-  teamId: number;
-  raceId: number;
-  position: number;
-}
-
-interface InsertRating {
-  resultId: number;
-  raterId: number;
-  rating: number;
-}
-
-interface InsertedResult {
-  id: number;
-}
-
-interface ApiResponse<T> {
-  success: boolean;
-  data: T[];
-}
+import {
+  ApiResponse,
+  GrandPrix,
+  Race,
+  Driver,
+  Rater,
+  Team,
+  InsertResult,
+  InsertedResult,
+  InsertRating,
+} from "./types";
+import PositionSelect from "./components/position-select";
 
 const getGrandPrixs = async () => {
   const response = await axios.get<ApiResponse<GrandPrix>>(
@@ -180,7 +135,7 @@ export default function Dashboard() {
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   const [selectedDriverId, setSelectedDriverId] = useState<number | null>(null);
   const [ratings, setRatings] = useState<{ [key: number]: number }>({});
-  const [selectedPosition, setSelectedPosition] = useState<number>();
+  const [position, setPosition] = useState<number | undefined>(undefined);
 
   const {
     data: grandPrixs,
@@ -260,8 +215,8 @@ export default function Dashboard() {
     }));
   };
 
-  const handlePositionChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPosition(Number(event.target.value));
+  const handlePositionChange = (newPosition: number) => {
+    setPosition(newPosition);
   };
 
   // TODO: Add Validation
@@ -270,7 +225,7 @@ export default function Dashboard() {
       driverId: selectedDriverId!,
       teamId: selectedTeamId!,
       raceId: selectedRaceId!,
-      position: selectedPosition!,
+      position: position!,
     };
     mutation.mutate(newData);
   };
@@ -330,20 +285,7 @@ export default function Dashboard() {
           )}
         </fieldset>
 
-        <fieldset className="fieldset">
-          <legend className="fieldset-legend">Position</legend>
-          <select
-            className="select"
-            value={selectedPosition}
-            onChange={handlePositionChange}
-          >
-            {Array.from({ length: 20 }, (_, index) => (
-              <option key={index + 1} value={index + 1}>
-                {index + 1}
-              </option>
-            ))}
-          </select>
-        </fieldset>
+        <PositionSelect onPositionChange={handlePositionChange} />
 
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Driver</legend>
@@ -414,7 +356,7 @@ export default function Dashboard() {
 
         {selectedGrandPrixId && <div>Grand Prix Id: {selectedGrandPrixId}</div>}
         {selectedRaceId && <div>Race Id: {selectedRaceId}</div>}
-        {selectedPosition && <div>Position: {selectedPosition}</div>}
+        {position && <div>Position: {position}</div>}
         {selectedDriverId && <div>Driver Id: {selectedDriverId}</div>}
         {selectedTeamId && <div>Team Id: {selectedTeamId}</div>}
         {Object.entries(ratings).map(([raterId, rating]) => (
@@ -423,7 +365,11 @@ export default function Dashboard() {
           </div>
         ))}
 
-        <button onClick={handleClick} disabled={mutation.isPending}>
+        <button
+          className="btn"
+          onClick={handleClick}
+          disabled={mutation.isPending}
+        >
           {mutation.isPending ? "Inserting..." : "Insert Data"}
         </button>
       </div>
