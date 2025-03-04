@@ -5,24 +5,17 @@ import { usePulsy } from "pulsy";
 import { ChangeEvent, useState } from "react";
 
 import DriverSelect from "./components/driver-select";
+import GrandPrixSelect from "./components/grand-prix-select";
 import PositionSelect from "./components/position-select";
 import TeamSelect from "./components/team-select";
 import {
   ApiResponse,
-  GrandPrix,
   InsertedResult,
   InsertRating,
   InsertResult,
   Race,
   Rater,
 } from "./types";
-
-const getGrandPrixs = async () => {
-  const response = await axios.get<ApiResponse<GrandPrix>>(
-    "http://localhost:8080/api/grandPrixs"
-  );
-  return response.data;
-};
 
 const getGrandPrixRaces = async (grandPrixId: number) => {
   const response = await axios.get<ApiResponse<Race>>(
@@ -114,35 +107,24 @@ const Select = ({
 
 export default function Dashboard() {
   const [auth] = usePulsy<{ user: string }>("auth");
-  const [selectedGrandPrixId, setSelectedGrandPrixId] = useState<number | null>(
-    null
-  );
   const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
   const [ratings, setRatings] = useState<{ [key: number]: number }>({});
   const [position, setPosition] = useState<number | undefined>(undefined);
   const [driverId, setDriverId] = useState<number | null>(null);
   const [teamId, setTeamId] = useState<number | null>(null);
-
-  const {
-    data: grandPrixs,
-    error: grandPrixsError,
-    isLoading: isLoadingGrandPrixs,
-  } = useQuery({
-    queryKey: ["grandPrixsData"],
-    queryFn: getGrandPrixs,
-  });
+  const [grandPrixId, setGrandPrixId] = useState<number | null>(null);
 
   const {
     data: races,
     error: racesError,
     isLoading: isLoadingRaces,
   } = useQuery({
-    queryKey: ["grandPrixRaces", selectedGrandPrixId],
+    queryKey: ["grandPrixRaces", grandPrixId],
     queryFn: () =>
-      selectedGrandPrixId
-        ? getGrandPrixRaces(selectedGrandPrixId)
+      grandPrixId
+        ? getGrandPrixRaces(grandPrixId)
         : Promise.resolve({ success: false, data: [] }),
-    enabled: !!selectedGrandPrixId,
+    enabled: !!grandPrixId,
   });
 
   const {
@@ -152,7 +134,7 @@ export default function Dashboard() {
   } = useQuery({
     queryKey: ["ratersData"],
     queryFn: getRaters,
-    enabled: !!selectedGrandPrixId && !!selectedRaceId,
+    enabled: !!grandPrixId && !!selectedRaceId,
   });
 
   const mutation = useMutation({
@@ -179,6 +161,10 @@ export default function Dashboard() {
       ...prevRatings,
       [raterId]: value,
     }));
+  };
+
+  const handleGrandPrixChange = (grandPrixId: number | null) => {
+    setGrandPrixId(grandPrixId);
   };
 
   const handlePositionChange = (newPosition: number) => {
@@ -210,27 +196,7 @@ export default function Dashboard() {
         <h2>Welcome, {auth.user}!</h2>
       </div>
       <div>
-        <fieldset className="fieldset">
-          <legend className="fieldset-legend">Grand Prix</legend>
-          <Select
-            value={selectedGrandPrixId}
-            onChange={(e) => setSelectedGrandPrixId(Number(e.target.value))}
-            options={
-              isLoadingGrandPrixs
-                ? [{ id: -1, label: "Loading grand prixs..." }]
-                : grandPrixs?.data.map((grandPrix) => ({
-                    id: grandPrix.id,
-                    label: grandPrix.name,
-                  })) ?? []
-            }
-            placeholder="Pick a Grand Prix"
-          />
-          {grandPrixsError && (
-            <div className="fieldset-label text-error">
-              {grandPrixsError.message}
-            </div>
-          )}
-        </fieldset>
+        <GrandPrixSelect onGrandPrixSelect={handleGrandPrixChange} />
 
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Race</legend>
@@ -250,7 +216,7 @@ export default function Dashboard() {
                   })) ?? []
             }
             placeholder="Pick a Race"
-            disabled={!selectedGrandPrixId}
+            disabled={!grandPrixId}
           />
           {racesError && (
             <div className="fieldset-label text-error">
@@ -286,7 +252,7 @@ export default function Dashboard() {
           </fieldset>
         ))}
 
-        {selectedGrandPrixId && <div>Grand Prix Id: {selectedGrandPrixId}</div>}
+        {grandPrixId && <div>Grand Prix Id: {grandPrixId}</div>}
         {selectedRaceId && <div>Race Id: {selectedRaceId}</div>}
         {position && <div>Position: {position}</div>}
         {driverId && <div>Driver Id: {driverId}</div>}
