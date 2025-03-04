@@ -6,6 +6,7 @@ import { ChangeEvent, useState } from "react";
 
 import DriverSelect from "./components/driver-select";
 import PositionSelect from "./components/position-select";
+import TeamSelect from "./components/team-select";
 import {
   ApiResponse,
   GrandPrix,
@@ -14,7 +15,6 @@ import {
   InsertResult,
   Race,
   Rater,
-  Team,
 } from "./types";
 
 const getGrandPrixs = async () => {
@@ -34,13 +34,6 @@ const getGrandPrixRaces = async (grandPrixId: number) => {
 const getRaters = async () => {
   const response = await axios.get<ApiResponse<Rater>>(
     "http://localhost:8080/api/raters"
-  );
-  return response.data;
-};
-
-const getTeams = async () => {
-  const response = await axios.get<ApiResponse<Team>>(
-    "http://localhost:8080/api/teams"
   );
   return response.data;
 };
@@ -125,10 +118,10 @@ export default function Dashboard() {
     null
   );
   const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
-  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   const [ratings, setRatings] = useState<{ [key: number]: number }>({});
   const [position, setPosition] = useState<number | undefined>(undefined);
   const [driverId, setDriverId] = useState<number | null>(null);
+  const [teamId, setTeamId] = useState<number | null>(null);
 
   const {
     data: grandPrixs,
@@ -159,16 +152,6 @@ export default function Dashboard() {
   } = useQuery({
     queryKey: ["ratersData"],
     queryFn: getRaters,
-    enabled: !!selectedGrandPrixId && !!selectedRaceId,
-  });
-
-  const {
-    data: teams,
-    error: teamsError,
-    isLoading: isLoadingTeams,
-  } = useQuery({
-    queryKey: ["teamsData"],
-    queryFn: getTeams,
     enabled: !!selectedGrandPrixId && !!selectedRaceId,
   });
 
@@ -206,11 +189,15 @@ export default function Dashboard() {
     setDriverId(driverId);
   };
 
+  const handleTeamSelect = (teamId: number | null) => {
+    setTeamId(teamId);
+  };
+
   // TODO: Add Validation
   const handleClick = () => {
     const newData = {
       driverId: driverId!,
-      teamId: selectedTeamId!,
+      teamId: teamId!,
       raceId: selectedRaceId!,
       position: position!,
     };
@@ -276,28 +263,7 @@ export default function Dashboard() {
 
         <DriverSelect onDriverSelect={handleDriverSelect} />
 
-        <fieldset className="fieldset">
-          <legend className="fieldset-legend">Teams</legend>
-          <Select
-            value={selectedTeamId}
-            onChange={(e) => setSelectedTeamId(Number(e.target.value))}
-            options={
-              isLoadingTeams
-                ? [{ id: -1, label: "Loading teams..." }]
-                : teams?.data.map((team) => ({
-                    id: team.id,
-                    label: team.name,
-                  })) ?? []
-            }
-            placeholder="Pick a Team"
-            disabled={!selectedGrandPrixId || !selectedRaceId}
-          />
-          {teamsError && (
-            <div className="fieldset-label text-error">
-              {teamsError.message}
-            </div>
-          )}
-        </fieldset>
+        <TeamSelect onTeamSelect={handleTeamSelect} />
 
         {ratersError && (
           <div className="fieldset-label text-error">{ratersError.message}</div>
@@ -324,7 +290,7 @@ export default function Dashboard() {
         {selectedRaceId && <div>Race Id: {selectedRaceId}</div>}
         {position && <div>Position: {position}</div>}
         {driverId && <div>Driver Id: {driverId}</div>}
-        {selectedTeamId && <div>Team Id: {selectedTeamId}</div>}
+        {teamId && <div>Team Id: {teamId}</div>}
         {Object.entries(ratings).map(([raterId, rating]) => (
           <div key={raterId}>
             Rater ID: {raterId}, Rating: {rating}
