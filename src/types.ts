@@ -49,6 +49,7 @@ export interface InsertRating {
 
 export interface InsertedResult {
   id: number;
+  driverId: number;
 }
 
 export interface ApiResponse<T> {

@@ -4,12 +4,9 @@ import { usePulsy } from "pulsy";
 import { useState } from "react";
 
 import { logout } from "./auth-service";
-import DriverSelect from "./components/driver-select";
+import CreateResult from "./components/create-result";
 import GrandPrixSelect from "./components/grand-prix-select";
-import PositionSelect from "./components/position-select";
 import RaceSelect from "./components/race-select";
-import RatingsInput from "./components/ratings-input";
-import TeamSelect from "./components/team-select";
 import {
   ApiResponse,
   InsertedResult,
@@ -77,25 +74,36 @@ const insertRating = async (data: InsertRating[]) => {
 
 export default function Dashboard() {
   const [auth] = usePulsy<{ user: string }>("auth");
-  const [driverId, setDriverId] = useState<number | null>(null);
   const [grandPrixId, setGrandPrixId] = useState<number | null>(null);
-  const [position, setPosition] = useState<number | null>(null);
   const [raceId, setRaceId] = useState<number | null>(null);
-  const [ratings, setRatings] = useState<{ [key: number]: number }>({});
-  const [teamId, setTeamId] = useState<number | null>(null);
+  const [results, setResults] = useState<
+    {
+      driverId: number | null;
+      position: number | null;
+      ratings: { [key: number]: number };
+      teamId: number | null;
+    }[]
+  >([{ driverId: null, position: null, ratings: {}, teamId: null }]);
+  const [createResultCount, setCreateResultCount] = useState(0);
 
   const mutation = useMutation({
     mutationFn: insertResult,
     onSuccess: (data) => {
-      data.data.map((result) => {
-        const ratingsArray: InsertRating[] = Object.entries(ratings).map(
-          ([raterId, rating]) => ({
+      data.data.forEach((result) => {
+        const correspondingResult = results.find(
+          (r) => r.driverId === result.driverId
+        );
+
+        if (correspondingResult) {
+          const ratingsArray: InsertRating[] = Object.entries(
+            correspondingResult.ratings
+          ).map(([raterId, rating]) => ({
             resultId: result.id,
             raterId: Number(raterId),
             rating,
-          })
-        );
-        insertRating(ratingsArray);
+          }));
+          insertRating(ratingsArray);
+        }
       });
     },
     onError: (error: any) => {
@@ -103,39 +111,46 @@ export default function Dashboard() {
     },
   });
 
-  const handleDriverSelect = (driverId: number | null) => {
-    setDriverId(driverId);
-  };
-
   const handleGranPrixSelect = (grandPrixId: number | null) => {
     setGrandPrixId(grandPrixId);
-  };
-
-  const handlePositionSelect = (newPosition: number | null) => {
-    setPosition(newPosition);
   };
 
   const handleRaceSelect = (raceId: number | null) => {
     setRaceId(raceId);
   };
 
-  const handleRatingsChange = (newRatings: { [key: number]: number }) => {
-    setRatings(newRatings);
-  };
-
-  const handleTeamSelect = (teamId: number | null) => {
-    setTeamId(teamId);
-  };
-
   // TODO: Add Validation
   const handleClick = () => {
-    const newData = {
-      driverId: driverId!,
-      teamId: teamId!,
-      raceId: raceId!,
-      position: position!,
+    results.forEach((result) => {
+      const newData = {
+        driverId: result.driverId!,
+        teamId: result.teamId!,
+        raceId: raceId!,
+        position: result.position!,
+      };
+      mutation.mutate(newData);
+    });
+  };
+
+  const handleResultChange =
+    (index: number) =>
+    (result: {
+      driverId: number | null;
+      position: number | null;
+      ratings: { [key: number]: number };
+      teamId: number | null;
+    }) => {
+      const newResults = [...results];
+      newResults[index] = result;
+      setResults(newResults);
     };
-    mutation.mutate(newData);
+
+  const addCreateResult = () => {
+    setResults([
+      ...results,
+      { driverId: null, position: null, ratings: {}, teamId: null },
+    ]);
+    setCreateResultCount(createResultCount + 1);
   };
 
   return (
@@ -143,31 +158,39 @@ export default function Dashboard() {
       <div>
         <h2>Welcome, {auth.user}!</h2>
       </div>
-      <div>
-        <GrandPrixSelect onGrandPrixSelect={handleGranPrixSelect} />
+      <div className="flex flex-col space-y-4">
+        <div className="flex space-x-4">
+          <GrandPrixSelect onGrandPrixSelect={handleGranPrixSelect} />
+          {grandPrixId && (
+            <RaceSelect
+              grandPrixId={grandPrixId}
+              onRaceSelect={handleRaceSelect}
+            />
+          )}
+        </div>
 
-        {grandPrixId && (
-          <RaceSelect
-            grandPrixId={grandPrixId}
-            onRaceSelect={handleRaceSelect}
-          />
+        {grandPrixId && raceId && (
+          <>
+            <div className="flex flex-col space-y-4">
+              {results.map((_result, index) => (
+                <CreateResult
+                  key={index}
+                  onChange={handleResultChange(index)}
+                />
+              ))}
+            </div>
+            <button className="btn" onClick={addCreateResult}>
+              Add Result
+            </button>
+          </>
         )}
 
-        <PositionSelect onPositionSelect={handlePositionSelect} />
-        <DriverSelect onDriverSelect={handleDriverSelect} />
-        <TeamSelect onTeamSelect={handleTeamSelect} />
-        <RatingsInput onRatingsChange={handleRatingsChange} />
+        <div>
+          {grandPrixId && <div>"grandPrixId": {grandPrixId}</div>}
+          {raceId && <div>"raceId": {raceId}</div>}
+          <pre>{JSON.stringify(results, null, 2)}</pre>
+        </div>
 
-        {grandPrixId && <div>Grand Prix Id: {grandPrixId}</div>}
-        {raceId && <div>Race Id: {raceId}</div>}
-        {position && <div>Position: {position}</div>}
-        {driverId && <div>Driver Id: {driverId}</div>}
-        {teamId && <div>Team Id: {teamId}</div>}
-        {Object.entries(ratings).map(([raterId, rating]) => (
-          <div key={raterId}>
-            Rater ID: {raterId}, Rating: {rating}
-          </div>
-        ))}
         <button
           className="btn"
           onClick={handleClick}

@@ -53,7 +53,7 @@ export default function RatingsInput({ onRatingsChange }: RatingsInputProps) {
           <legend className="fieldset-legend">{rater.name}</legend>
           <input
             type="number"
-            className="input"
+            className="input w-20"
             placeholder="Rating"
             value={ratings[rater.id] || ""}
             onChange={(e) =>
