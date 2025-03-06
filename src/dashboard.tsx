@@ -15,7 +15,7 @@ import {
 } from "./types";
 
 const insertResult = async (
-  data: InsertResult
+  data: InsertResult[]
 ): Promise<ApiResponse<InsertedResult>> => {
   try {
     const pulsyAuth = localStorage.getItem("pulsy_auth");
@@ -29,7 +29,7 @@ const insertResult = async (
 
     const response = await axios.post<ApiResponse<InsertedResult>>(
       "http://localhost:8080/api/results",
-      data,
+      { results: data },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ const insertRating = async (data: InsertRating[]) => {
 
     const response = await axios.post(
       "http://localhost:8080/api/ratings",
-      data,
+      { ratings: data },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -88,8 +88,10 @@ export default function Dashboard() {
 
   const mutation = useMutation({
     mutationFn: insertResult,
-    onSuccess: (data) => {
-      data.data.forEach((result) => {
+    onSuccess: ({ data }) => {
+      const allRatings: InsertRating[] = [];
+
+      data.forEach((result) => {
         const correspondingResult = results.find(
           (r) => r.driverId === result.driverId
         );
@@ -102,9 +104,14 @@ export default function Dashboard() {
             raterId: Number(raterId),
             rating,
           }));
-          insertRating(ratingsArray);
+
+          allRatings.push(...ratingsArray);
         }
       });
+
+      if (allRatings.length > 0) {
+        insertRating(allRatings);
+      }
     },
     onError: (error: any) => {
       console.error("Error inserting data:", error);
@@ -121,15 +128,14 @@ export default function Dashboard() {
 
   // TODO: Add Validation
   const handleClick = () => {
-    results.forEach((result) => {
-      const newData = {
-        driverId: result.driverId!,
-        teamId: result.teamId!,
-        raceId: raceId!,
-        position: result.position!,
-      };
-      mutation.mutate(newData);
-    });
+    const dataToSend = results.map((result) => ({
+      driverId: result.driverId!,
+      teamId: result.teamId!,
+      raceId: raceId!,
+      position: result.position!,
+    }));
+
+    mutation.mutate(dataToSend);
   };
 
   const handleResultChange =
