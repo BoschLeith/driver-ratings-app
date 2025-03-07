@@ -106,7 +106,7 @@ export default function Dashboard() {
   return (
     <>
       <div>
-        <h2>Welcome, {auth.user}!</h2>
+        <h2 className="pb-6">Welcome, {auth.user}!</h2>
       </div>
       <div className="flex flex-col space-y-4">
         <div className="flex space-x-4">

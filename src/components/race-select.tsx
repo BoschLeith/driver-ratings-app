@@ -52,9 +52,10 @@ export default function RaceSelect({
   };
 
   return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">Race</legend>
+    <label className="floating-label">
+      <span>Race</span>
       <select
+        id="race-select"
         className="select"
         value={selectedRaceId || ""}
         onChange={handleChange}
@@ -68,6 +69,6 @@ export default function RaceSelect({
           </option>
         ))}
       </select>
-    </fieldset>
+    </label>
   );
 }

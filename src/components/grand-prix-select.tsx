@@ -46,9 +46,10 @@ export default function GrandPrixSelect({
   };
 
   return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">Grand Prix</legend>
+    <label className="floating-label">
+      <span>Grand Prix</span>
       <select
+        id="grandPrix-select"
         className="select"
         value={selectedGrandPrixId || ""}
         onChange={handleChange}
@@ -62,6 +63,6 @@ export default function GrandPrixSelect({
           </option>
         ))}
       </select>
-    </fieldset>
+    </label>
   );
 }
