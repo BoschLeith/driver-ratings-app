@@ -6,7 +6,11 @@ import { insertRating, insertResult } from "./api-service";
 import CreateResult from "./components/create-result";
 import GrandPrixSelect from "./components/grand-prix-select";
 import RaceSelect from "./components/race-select";
-import { useDriversQuery, useTeamsQuery } from "./query-service";
+import {
+  useDriversQuery,
+  useRatersQuery,
+  useTeamsQuery,
+} from "./query-service";
 import { InsertRating } from "./types";
 
 export default function Dashboard() {
@@ -24,6 +28,7 @@ export default function Dashboard() {
   const [createResultCount, setCreateResultCount] = useState(0);
   const { drivers } = useDriversQuery();
   const { teams } = useTeamsQuery();
+  const { raters } = useRatersQuery();
 
   const mutation = useMutation({
     mutationFn: insertResult,
@@ -123,6 +128,7 @@ export default function Dashboard() {
                   onChange={handleResultChange(index)}
                   drivers={drivers ? drivers.data : []}
                   teams={teams ? teams.data : []}
+                  raters={raters ? raters.data : []}
                 />
               ))}
             </div>

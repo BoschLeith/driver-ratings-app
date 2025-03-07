@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getDrivers, getTeams } from "./api-service";
+import { getDrivers, getRaters, getTeams } from "./api-service";
 
 export const useDriversQuery = () => {
   const { data, isLoading, isError } = useQuery({
@@ -25,5 +25,18 @@ export const useTeamsQuery = () => {
     teams: data,
     isTeamsLoading: isLoading,
     isTeamsError: isError,
+  };
+};
+
+export const useRatersQuery = () => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["ratersData"],
+    queryFn: getRaters,
+  });
+
+  return {
+    raters: data,
+    isRatersLoading: isLoading,
+    isRatersError: isError,
   };
 };
