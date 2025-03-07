@@ -3,10 +3,18 @@ import axios from "axios";
 import { logout } from "./auth-service";
 import {
   ApiResponse,
+  Driver,
   InsertedResult,
   InsertRating,
   InsertResult,
 } from "./types";
+
+export const getDrivers = async () => {
+  const response = await axios.get<ApiResponse<Driver>>(
+    "http://localhost:8080/api/drivers"
+  );
+  return response.data;
+};
 
 export const insertResult = async (
   data: InsertResult[]

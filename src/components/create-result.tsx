@@ -4,8 +4,10 @@ import DriverSelect from "./driver-select";
 import PositionSelect from "./position-select";
 import RatingsInput from "./ratings-input";
 import TeamSelect from "./team-select";
+import { Driver } from "../types";
 
 interface CreateResultProps {
+  drivers: Driver[] | undefined;
   onChange: (result: {
     driverId: number | null;
     position: number | null;
@@ -14,7 +16,7 @@ interface CreateResultProps {
   }) => void;
 }
 
-export default function CreateResult({ onChange }: CreateResultProps) {
+export default function CreateResult({ drivers, onChange }: CreateResultProps) {
   const [driverId, setDriverId] = useState<number | null>(null);
   const [position, setPosition] = useState<number | null>(null);
   const [ratings, setRatings] = useState<{ [key: number]: number }>({});
@@ -51,7 +53,7 @@ export default function CreateResult({ onChange }: CreateResultProps) {
       <div className="card-body">
         <div className="flex space-x-4">
           <PositionSelect onPositionSelect={handlePositionSelect} />
-          <DriverSelect onDriverSelect={handleDriverSelect} />
+          <DriverSelect drivers={drivers} onDriverSelect={handleDriverSelect} />
           <TeamSelect onTeamSelect={handleTeamSelect} />
           <RatingsInput onRatingsChange={handleRatingsChange} />
         </div>

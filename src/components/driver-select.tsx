@@ -1,39 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { ChangeEvent, useState } from "react";
 
-import { ApiResponse, Driver } from "../types";
-
-const getDrivers = async () => {
-  const response = await axios.get<ApiResponse<Driver>>(
-    "http://localhost:8080/api/drivers"
-  );
-  return response.data;
-};
+import { Driver } from "../types";
 
 interface DriverSelectProps {
+  drivers: Driver[] | undefined;
   onDriverSelect: (driverId: number | null) => void;
 }
 
-export default function DriverSelect({ onDriverSelect }: DriverSelectProps) {
+export default function DriverSelect({
+  drivers,
+  onDriverSelect,
+}: DriverSelectProps) {
   const [selectedDriverId, setSelectedDriverId] = useState<number | null>(null);
-
-  const {
-    data: drivers,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["driversData"],
-    queryFn: getDrivers,
-  });
-
-  if (isLoading) {
-    return <p>Loading drivers...</p>;
-  }
-
-  if (isError) {
-    return <p>Error loading drivers.</p>;
-  }
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const driverId = Number(e.target.value);
@@ -52,11 +30,17 @@ export default function DriverSelect({ onDriverSelect }: DriverSelectProps) {
         <option value="" disabled>
           Select a driver
         </option>
-        {drivers?.data.map((driver) => (
-          <option key={driver.id} value={driver.id}>
-            {driver.firstName} {driver.lastName}
+        {drivers && drivers.length > 0 ? (
+          drivers.map((driver) => (
+            <option key={driver.id} value={driver.id}>
+              {driver.firstName} {driver.lastName}
+            </option>
+          ))
+        ) : (
+          <option value="" disabled>
+            No drivers available
           </option>
-        ))}
+        )}
       </select>
     </fieldset>
   );
