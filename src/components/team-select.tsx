@@ -1,39 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useState } from "react";
-import axios from "axios";
 
-import { ApiResponse, Team } from "../types";
-
-const getTeams = async () => {
-  const response = await axios.get<ApiResponse<Team>>(
-    "http://localhost:8080/api/teams"
-  );
-  return response.data;
-};
+import { Team } from "../types";
 
 interface TeamSelectProps {
+  teams: Team[] | undefined;
   onTeamSelect: (teamId: number | null) => void;
 }
 
-export default function TeamSelect({ onTeamSelect }: TeamSelectProps) {
+export default function TeamSelect({ teams, onTeamSelect }: TeamSelectProps) {
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
-
-  const {
-    data: teams,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["teamsData"],
-    queryFn: getTeams,
-  });
-
-  if (isLoading) {
-    return <p>Loading teams...</p>;
-  }
-
-  if (isError) {
-    return <p>Error loading teams.</p>;
-  }
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const teamId = Number(e.target.value);
@@ -52,11 +27,17 @@ export default function TeamSelect({ onTeamSelect }: TeamSelectProps) {
         <option value="" disabled>
           Select a team
         </option>
-        {teams?.data.map((team) => (
-          <option key={team.id} value={team.id}>
-            {team.name}
+        {teams && teams.length > 0 ? (
+          teams.map((team) => (
+            <option key={team.id} value={team.id}>
+              {team.name}
+            </option>
+          ))
+        ) : (
+          <option value="" disabled>
+            No teams available
           </option>
-        ))}
+        )}
       </select>
     </fieldset>
   );

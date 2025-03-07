@@ -7,11 +7,19 @@ import {
   InsertedResult,
   InsertRating,
   InsertResult,
+  Team,
 } from "./types";
 
 export const getDrivers = async () => {
   const response = await axios.get<ApiResponse<Driver>>(
     "http://localhost:8080/api/drivers"
+  );
+  return response.data;
+};
+
+export const getTeams = async () => {
+  const response = await axios.get<ApiResponse<Team>>(
+    "http://localhost:8080/api/teams"
   );
   return response.data;
 };

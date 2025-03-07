@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import { Driver, Team } from "../types";
 import DriverSelect from "./driver-select";
 import PositionSelect from "./position-select";
 import RatingsInput from "./ratings-input";
 import TeamSelect from "./team-select";
-import { Driver } from "../types";
 
 interface CreateResultProps {
   drivers: Driver[] | undefined;
+  teams: Team[] | undefined;
   onChange: (result: {
     driverId: number | null;
     position: number | null;
@@ -16,7 +17,11 @@ interface CreateResultProps {
   }) => void;
 }
 
-export default function CreateResult({ drivers, onChange }: CreateResultProps) {
+export default function CreateResult({
+  drivers,
+  teams,
+  onChange,
+}: CreateResultProps) {
   const [driverId, setDriverId] = useState<number | null>(null);
   const [position, setPosition] = useState<number | null>(null);
   const [ratings, setRatings] = useState<{ [key: number]: number }>({});
@@ -54,7 +59,7 @@ export default function CreateResult({ drivers, onChange }: CreateResultProps) {
         <div className="flex space-x-4">
           <PositionSelect onPositionSelect={handlePositionSelect} />
           <DriverSelect drivers={drivers} onDriverSelect={handleDriverSelect} />
-          <TeamSelect onTeamSelect={handleTeamSelect} />
+          <TeamSelect teams={teams} onTeamSelect={handleTeamSelect} />
           <RatingsInput onRatingsChange={handleRatingsChange} />
         </div>
       </div>
