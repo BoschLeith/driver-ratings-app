@@ -5,6 +5,7 @@ import DriverSelect from "./driver-select";
 import PositionSelect from "./position-select";
 import RatingsInput from "./ratings-input";
 import TeamSelect from "./team-select";
+import { FaRegTrashCan } from "react-icons/fa6";
 
 interface CreateResultProps {
   index: number;
@@ -17,6 +18,7 @@ interface CreateResultProps {
     ratings: { [key: number]: number };
     teamId: number | null;
   }) => void;
+  onDelete: () => void;
 }
 
 export default function CreateResult({
@@ -25,6 +27,7 @@ export default function CreateResult({
   teams,
   raters,
   onChange,
+  onDelete,
 }: CreateResultProps) {
   const [driverId, setDriverId] = useState<number | null>(null);
   const [position, setPosition] = useState<number | null>(null);
@@ -82,6 +85,11 @@ export default function CreateResult({
           raters={raters}
           onRatingsChange={handleRatingsChange}
         />
+      </th>
+      <th>
+        <button className="btn btn-square" onClick={onDelete}>
+          <FaRegTrashCan />
+        </button>
       </th>
     </tr>
   );

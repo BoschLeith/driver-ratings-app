@@ -103,6 +103,11 @@ export default function Dashboard() {
     setCreateResultCount(createResultCount + 1);
   };
 
+  const deleteCreateResult = (index: number) => {
+    const newResults = results.filter((_, i) => i !== index);
+    setResults(newResults);
+  };
+
   return (
     <>
       <div>
@@ -137,6 +142,7 @@ export default function Dashboard() {
                       key={index}
                       index={index}
                       onChange={handleResultChange(index)}
+                      onDelete={() => deleteCreateResult(index)}
                       drivers={drivers ? drivers.data : []}
                       teams={teams ? teams.data : []}
                       raters={raters ? raters.data : []}
