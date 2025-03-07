@@ -3,11 +3,16 @@ import { ChangeEvent, useState } from "react";
 import { Team } from "../types";
 
 interface TeamSelectProps {
+  index: number;
   teams: Team[] | undefined;
   onTeamSelect: (teamId: number | null) => void;
 }
 
-export default function TeamSelect({ teams, onTeamSelect }: TeamSelectProps) {
+export default function TeamSelect({
+  index,
+  teams,
+  onTeamSelect,
+}: TeamSelectProps) {
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -17,28 +22,26 @@ export default function TeamSelect({ teams, onTeamSelect }: TeamSelectProps) {
   };
 
   return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">Team</legend>
-      <select
-        className="select"
-        value={selectedTeamId || ""}
-        onChange={handleChange}
-      >
-        <option value="" disabled>
-          Select a team
-        </option>
-        {teams && teams.length > 0 ? (
-          teams.map((team) => (
-            <option key={team.id} value={team.id}>
-              {team.name}
-            </option>
-          ))
-        ) : (
-          <option value="" disabled>
-            No teams available
+    <select
+      id={`team-select-${index}`}
+      className="select"
+      value={selectedTeamId || ""}
+      onChange={handleChange}
+    >
+      <option value="" disabled>
+        Select a team
+      </option>
+      {teams && teams.length > 0 ? (
+        teams.map((team) => (
+          <option key={team.id} value={team.id}>
+            {team.name}
           </option>
-        )}
-      </select>
-    </fieldset>
+        ))
+      ) : (
+        <option value="" disabled>
+          No teams available
+        </option>
+      )}
+    </select>
   );
 }

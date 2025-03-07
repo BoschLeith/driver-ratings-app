@@ -121,16 +121,29 @@ export default function Dashboard() {
 
         {grandPrixId && raceId && (
           <>
-            <div className="flex flex-col space-y-4">
-              {results.map((_result, index) => (
-                <CreateResult
-                  key={index}
-                  onChange={handleResultChange(index)}
-                  drivers={drivers ? drivers.data : []}
-                  teams={teams ? teams.data : []}
-                  raters={raters ? raters.data : []}
-                />
-              ))}
+            <div className="overflow-x-auto">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Position</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th>Ratings</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((_result, index) => (
+                    <CreateResult
+                      key={index}
+                      index={index}
+                      onChange={handleResultChange(index)}
+                      drivers={drivers ? drivers.data : []}
+                      teams={teams ? teams.data : []}
+                      raters={raters ? raters.data : []}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
             <button className="btn" onClick={addCreateResult}>
               Add Result

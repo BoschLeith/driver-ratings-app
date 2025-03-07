@@ -7,6 +7,7 @@ import RatingsInput from "./ratings-input";
 import TeamSelect from "./team-select";
 
 interface CreateResultProps {
+  index: number;
   drivers: Driver[] | undefined;
   teams: Team[] | undefined;
   raters: Rater[] | undefined;
@@ -19,6 +20,7 @@ interface CreateResultProps {
 }
 
 export default function CreateResult({
+  index,
   drivers,
   teams,
   raters,
@@ -56,15 +58,31 @@ export default function CreateResult({
   }, [driverId, position, ratings, teamId]);
 
   return (
-    <div className="card card-border">
-      <div className="card-body">
-        <div className="flex space-x-4">
-          <PositionSelect onPositionSelect={handlePositionSelect} />
-          <DriverSelect drivers={drivers} onDriverSelect={handleDriverSelect} />
-          <TeamSelect teams={teams} onTeamSelect={handleTeamSelect} />
-          <RatingsInput raters={raters} onRatingsChange={handleRatingsChange} />
-        </div>
-      </div>
-    </div>
+    <tr>
+      <th className="min-w-3xs w-1/4">
+        <PositionSelect index={index} onPositionSelect={handlePositionSelect} />
+      </th>
+      <th className="min-w-3xs w-1/4">
+        <DriverSelect
+          index={index}
+          drivers={drivers}
+          onDriverSelect={handleDriverSelect}
+        />
+      </th>
+      <th className="min-w-3xs w-1/4">
+        <TeamSelect
+          index={index}
+          teams={teams}
+          onTeamSelect={handleTeamSelect}
+        />
+      </th>
+      <th className="flex space-x-2 min-w-75">
+        <RatingsInput
+          index={index}
+          raters={raters}
+          onRatingsChange={handleRatingsChange}
+        />
+      </th>
+    </tr>
   );
 }

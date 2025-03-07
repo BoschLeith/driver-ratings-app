@@ -3,11 +3,13 @@ import { ChangeEvent, useState } from "react";
 import { Driver } from "../types";
 
 interface DriverSelectProps {
+  index: number;
   drivers: Driver[] | undefined;
   onDriverSelect: (driverId: number | null) => void;
 }
 
 export default function DriverSelect({
+  index,
   drivers,
   onDriverSelect,
 }: DriverSelectProps) {
@@ -20,28 +22,26 @@ export default function DriverSelect({
   };
 
   return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">Driver</legend>
-      <select
-        className="select"
-        value={selectedDriverId || ""}
-        onChange={handleChange}
-      >
-        <option value="" disabled>
-          Select a driver
-        </option>
-        {drivers && drivers.length > 0 ? (
-          drivers.map((driver) => (
-            <option key={driver.id} value={driver.id}>
-              {driver.firstName} {driver.lastName}
-            </option>
-          ))
-        ) : (
-          <option value="" disabled>
-            No drivers available
+    <select
+      id={`driver-select-${index}`}
+      className="select"
+      value={selectedDriverId || ""}
+      onChange={handleChange}
+    >
+      <option value="" disabled>
+        Select a driver
+      </option>
+      {drivers && drivers.length > 0 ? (
+        drivers.map((driver) => (
+          <option key={driver.id} value={driver.id}>
+            {driver.firstName} {driver.lastName}
           </option>
-        )}
-      </select>
-    </fieldset>
+        ))
+      ) : (
+        <option value="" disabled>
+          No drivers available
+        </option>
+      )}
+    </select>
   );
 }

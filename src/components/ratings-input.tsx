@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { Rater } from "../types";
 
 interface RatingsInputProps {
+  index: number;
   raters: Rater[] | undefined;
   onRatingsChange: (ratings: { [key: number]: number }) => void;
 }
 
 export default function RatingsInput({
+  index,
   raters,
   onRatingsChange,
 }: RatingsInputProps) {
@@ -28,18 +30,19 @@ export default function RatingsInput({
     <>
       {raters && raters.length > 0 ? (
         raters.map((rater) => (
-          <fieldset className="fieldset" key={rater.id}>
-            <legend className="fieldset-legend">{rater.name}</legend>
+          <label className="floating-label" key={rater.id}>
+            <span>{rater.name}</span>
             <input
+              id={`${rater.name.toLocaleLowerCase()}-input-${index}`}
               type="number"
-              className="input w-20"
-              placeholder="Rating"
+              className="input"
+              placeholder={rater.name}
               value={ratings[rater.id] || ""}
               onChange={(e) =>
                 handleInputChange(rater.id, Number(e.target.value))
               }
             />
-          </fieldset>
+          </label>
         ))
       ) : (
         <div>No raters available</div>
