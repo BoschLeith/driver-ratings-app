@@ -1,48 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { DateTime } from "luxon";
 
-interface Driver {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-interface ApiResponse {
-  success: boolean;
-  data: Driver[];
-}
-
-const getDrivers = async () => {
-  const response = await axios.get<ApiResponse>(
-    "http://localhost:8080/api/drivers"
-  );
-  return response.data;
-};
+import { useDriversQuery } from "./query-service";
 
 export default function Drivers() {
-  const {
-    data: drivers,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["driversData"],
-    queryFn: getDrivers,
-  });
+  const { drivers, isDriversError, isDriversLoading } = useDriversQuery();
 
-  if (isLoading) return <div>Fetching drivers...</div>;
-  if (error) return <div>An error occurred: {error.message}</div>;
-  if (!drivers || drivers.data.length === 0) return <div>No data found</div>;
+  if (isDriversLoading) {
+    return <div>Fetching drivers...</div>;
+  }
+
+  if (isDriversError) {
+    return <div>An error occurred while fetching drivers.</div>;
+  }
+
+  if (!drivers || drivers.data.length === 0) {
+    return <div>No data found</div>;
+  }
 
   return (
-    <>
-      <div>Drivers</div>
+    <div className="overflow-x-auto">
       <table className="table">
         <thead>
           <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Driver Code</th>
             <th>Created At</th>
             <th>Updated At</th>
           </tr>
@@ -51,7 +33,10 @@ export default function Drivers() {
           {drivers.data.map((driver) => (
             <tr key={driver.id}>
               <td>{driver.id}</td>
-              <td>{driver.name}</td>
+              <td>
+                {driver.firstName} {driver.lastName}
+              </td>
+              <td>{driver.driverCode}</td>
               <td>
                 {DateTime.fromISO(driver.createdAt).toLocaleString(
                   DateTime.DATETIME_MED
@@ -68,6 +53,6 @@ export default function Drivers() {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 }
