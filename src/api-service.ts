@@ -4,6 +4,7 @@ import { logout } from "./auth-service";
 import {
   ApiResponse,
   Driver,
+  GrandPrix,
   InsertedResult,
   InsertRating,
   InsertResult,
@@ -28,6 +29,13 @@ export const getTeams = async () => {
 export const getRaters = async () => {
   const response = await axios.get<ApiResponse<Rater>>(
     "http://localhost:8080/api/raters"
+  );
+  return response.data;
+};
+
+export const getGrandPrixs = async () => {
+  const response = await axios.get<ApiResponse<GrandPrix>>(
+    "http://localhost:8080/api/grandPrixs"
   );
   return response.data;
 };

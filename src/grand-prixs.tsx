@@ -1,44 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { DateTime } from "luxon";
-
-interface GrandPrixs {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string | null;
-}
-
-interface ApiResponse {
-  success: boolean;
-  data: GrandPrixs[];
-}
-
-const getGrandPrixs = async () => {
-  const response = await axios.get<ApiResponse>(
-    "http://localhost:8080/api/grandPrixs"
-  );
-  return response.data;
-};
+import { useGrandPrixsQuery } from "./query-service";
+import { formatISODate } from "./utils/date-utils";
 
 export default function GrandPrixs() {
-  const {
-    data: grandPrixs,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["grandPrixsData"],
-    queryFn: getGrandPrixs,
-  });
+  const { data: grandPrixs, isLoading, isError } = useGrandPrixsQuery();
 
-  if (isLoading) return <div>Fetching grand prixs...</div>;
-  if (error) return <div>An error occurred: {error.message}</div>;
-  if (!grandPrixs || grandPrixs.data.length === 0)
+  if (isLoading) {
+    return <div>Fetching grand prixs...</div>;
+  }
+
+  if (isError) {
+    return <div>An error occurred while fetching grand prixs.</div>;
+  }
+
+  if (!grandPrixs || grandPrixs.data.length === 0) {
     return <div>No data found</div>;
+  }
 
   return (
-    <>
-      <div>Grand Prixs</div>
+    <div className="overflow-x-auto">
       <table className="table">
         <thead>
           <tr>
@@ -53,22 +32,14 @@ export default function GrandPrixs() {
             <tr key={grandPrix.id}>
               <td>{grandPrix.id}</td>
               <td>{grandPrix.name}</td>
+              <td>{formatISODate(grandPrix.createdAt)}</td>
               <td>
-                {DateTime.fromISO(grandPrix.createdAt).toLocaleString(
-                  DateTime.DATETIME_MED
-                )}
-              </td>
-              <td>
-                {grandPrix.updatedAt
-                  ? DateTime.fromISO(grandPrix.updatedAt).toLocaleString(
-                      DateTime.DATETIME_MED
-                    )
-                  : "-"}
+                {grandPrix.updatedAt ? formatISODate(grandPrix.updatedAt) : "-"}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 }

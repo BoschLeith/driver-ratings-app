@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getDrivers, getRaters, getTeams } from "./api-service";
+import { getDrivers, getGrandPrixs, getRaters, getTeams } from "./api-service";
 
 export const useDriversQuery = () => {
   const { data, isLoading, isError } = useQuery({
@@ -40,3 +40,9 @@ export const useRatersQuery = () => {
     isRatersError: isError,
   };
 };
+
+export const useGrandPrixsQuery = () =>
+  useQuery({
+    queryKey: ["grandPrixsData"],
+    queryFn: getGrandPrixs,
+  });
