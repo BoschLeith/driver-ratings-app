@@ -157,12 +157,6 @@ export default function Dashboard() {
           </>
         )}
 
-        <div>
-          {grandPrixId && <div>"grandPrixId": {grandPrixId}</div>}
-          {raceId && <div>"raceId": {raceId}</div>}
-          <pre>{JSON.stringify(results, null, 2)}</pre>
-        </div>
-
         <button
           className="btn"
           onClick={handleClick}
@@ -170,6 +164,16 @@ export default function Dashboard() {
         >
           {mutation.isPending ? "Inserting..." : "Insert Data"}
         </button>
+
+        <div className="collapse collapse-arrow bg-base-100 border-base-300 border">
+          <input type="checkbox" />
+          <div className="collapse-title font-semibold">Dev Tools</div>
+          <div className="collapse-content text-sm">
+            {grandPrixId && <div>"grandPrixId": {grandPrixId}</div>}
+            {raceId && <div>"raceId": {raceId}</div>}
+            <pre>{JSON.stringify(results, null, 2)}</pre>
+          </div>
+        </div>
       </div>
     </>
   );
