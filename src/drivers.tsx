@@ -1,6 +1,5 @@
-import { DateTime } from "luxon";
-
 import { useDriversQuery } from "./query-service";
+import { formatISODate } from "./utils/date-utils";
 
 export default function Drivers() {
   const { drivers, isDriversError, isDriversLoading } = useDriversQuery();
@@ -37,17 +36,9 @@ export default function Drivers() {
                 {driver.firstName} {driver.lastName}
               </td>
               <td>{driver.driverCode}</td>
+              <td>{formatISODate(driver.createdAt)}</td>
               <td>
-                {DateTime.fromISO(driver.createdAt).toLocaleString(
-                  DateTime.DATETIME_MED
-                )}
-              </td>
-              <td>
-                {driver.updatedAt
-                  ? DateTime.fromISO(driver.updatedAt).toLocaleString(
-                      DateTime.DATETIME_MED
-                    )
-                  : "-"}
+                {driver.updatedAt ? formatISODate(driver.updatedAt) : "-"}
               </td>
             </tr>
           ))}
