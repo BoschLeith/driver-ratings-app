@@ -1,16 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { ApiResponse, Race } from "../types";
+import { useGrandPrixRacesQuery } from "../query-service";
 import { formatISODate } from "../utils/date-utils";
-
-const getGrandPrixRaces = async (grandPrixId: number) => {
-  const response = await axios.get<ApiResponse<Race>>(
-    `http://localhost:8080/api/grandPrixs/${grandPrixId}/races`
-  );
-  return response.data;
-};
 
 interface RaceSelectProps {
   grandPrixId: number;
@@ -21,16 +12,12 @@ export default function RaceSelect({
   grandPrixId,
   onRaceSelect,
 }: RaceSelectProps) {
-  const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
-
   const {
     data: races,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ["racesData", grandPrixId],
-    queryFn: () => getGrandPrixRaces(grandPrixId),
-  });
+  } = useGrandPrixRacesQuery(grandPrixId);
+  const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
 
   useEffect(() => {
     setSelectedRaceId(null);

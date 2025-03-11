@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import {
   getDrivers,
+  getGrandPrixRaces,
   getGrandPrixs,
   getRaces,
   getRaters,
@@ -51,6 +52,12 @@ export const useGrandPrixsQuery = () =>
   useQuery({
     queryKey: ["grandPrixsData"],
     queryFn: getGrandPrixs,
+  });
+
+export const useGrandPrixRacesQuery = (grandPrixId: number) =>
+  useQuery({
+    queryKey: ["racesData", grandPrixId],
+    queryFn: () => getGrandPrixRaces(grandPrixId),
   });
 
 export const useRacesQuery = () =>

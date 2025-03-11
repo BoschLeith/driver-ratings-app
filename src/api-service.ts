@@ -41,6 +41,13 @@ export const getGrandPrixs = async () => {
   return response.data;
 };
 
+export const getGrandPrixRaces = async (grandPrixId: number) => {
+  const response = await axios.get<ApiResponse<Race>>(
+    `http://localhost:8080/api/grandPrixs/${grandPrixId}/races`
+  );
+  return response.data;
+};
+
 export const getRaces = async () => {
   const response = await axios.get<ApiResponse<Race>>(
     "http://localhost:8080/api/races"
