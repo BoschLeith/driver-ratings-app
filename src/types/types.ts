@@ -78,3 +78,20 @@ export interface ApiResponse<T> {
   success: boolean;
   data: T[];
 }
+
+export interface ApiRating {
+  rating: number;
+  raterName: string;
+}
+
+export interface ApiDriver {
+  id: number;
+  driverCode: string;
+  position: number;
+  ratings: ApiRating[];
+}
+
+export interface ApiRace {
+  raceId: number;
+  drivers: ApiDriver[];
+}

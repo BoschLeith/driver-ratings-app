@@ -1,19 +1,20 @@
 import axios from "axios";
 
-import { logout } from "./auth-service";
 import {
+  ApiRace,
   ApiResponse,
   Driver,
-  Team,
-  Rater,
   GrandPrix,
-  Race,
-  Rating,
-  Result,
-  InsertResult,
   InsertedResult,
   InsertRating,
+  InsertResult,
+  Race,
+  Rater,
+  Rating,
+  Result,
+  Team,
 } from "../types/types";
+import { logout } from "./auth-service";
 
 export const getDrivers = async () => {
   const response = await axios.get<ApiResponse<Driver>>(
@@ -67,6 +68,13 @@ export const getRatings = async () => {
 export const getResults = async () => {
   const response = await axios.get<ApiResponse<Result>>(
     "http://localhost:8080/api/results"
+  );
+  return response.data;
+};
+
+export const getResultsByYear = async (year: number) => {
+  const response = await axios.get<ApiResponse<ApiRace>>(
+    `http://localhost:8080/api/races/${year}/results`
   );
   return response.data;
 };

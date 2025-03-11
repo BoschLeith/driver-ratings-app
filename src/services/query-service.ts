@@ -8,6 +8,7 @@ import {
   getRaters,
   getRatings,
   getResults,
+  getResultsByYear,
   getTeams,
 } from "./api-service";
 
@@ -57,4 +58,10 @@ export const useRatingsQuery = () =>
   useQuery({
     queryKey: ["ratingsData"],
     queryFn: getRatings,
+  });
+
+export const useResultsByYearQuery = (year: number) =>
+  useQuery({
+    queryKey: ["racesData", year],
+    queryFn: () => getResultsByYear(year),
   });
