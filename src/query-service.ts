@@ -6,6 +6,7 @@ import {
   getGrandPrixs,
   getRaces,
   getRaters,
+  getRatings,
   getTeams,
 } from "./api-service";
 
@@ -57,4 +58,10 @@ export const useRacesQuery = () =>
   useQuery({
     queryKey: ["racesData"],
     queryFn: getRaces,
+  });
+
+export const useRatingsQuery = () =>
+  useQuery({
+    queryKey: ["ratingsData"],
+    queryFn: getRatings,
   });

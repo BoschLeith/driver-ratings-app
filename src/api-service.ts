@@ -10,6 +10,7 @@ import {
   InsertResult,
   Race,
   Rater,
+  Rating,
   Team,
 } from "./types";
 
@@ -51,6 +52,13 @@ export const getGrandPrixRaces = async (grandPrixId: number) => {
 export const getRaces = async () => {
   const response = await axios.get<ApiResponse<Race>>(
     "http://localhost:8080/api/races"
+  );
+  return response.data;
+};
+
+export const getRatings = async () => {
+  const response = await axios.get<ApiResponse<Rating>>(
+    "http://localhost:8080/api/ratings"
   );
   return response.data;
 };

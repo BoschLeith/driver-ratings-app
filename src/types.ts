@@ -29,6 +29,15 @@ export interface Rater {
   updatedAt: string | null;
 }
 
+export interface Rating {
+  id: number;
+  resultId: number;
+  raterId: number;
+  rating: number;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
 export interface Team {
   id: number;
   name: string;
