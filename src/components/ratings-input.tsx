@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Rater } from "../types";
+import { Rater } from "../types/types";
 
 interface RatingsInputProps {
   index: number;

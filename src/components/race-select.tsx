@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { useGrandPrixRacesQuery } from "../query-service";
 import { formatISODate } from "../utils/date-utils";
+import { useGrandPrixRacesQuery } from "../services/query-service";
 
 interface RaceSelectProps {
   grandPrixId: number;

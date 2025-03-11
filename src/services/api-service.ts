@@ -4,16 +4,16 @@ import { logout } from "./auth-service";
 import {
   ApiResponse,
   Driver,
-  GrandPrix,
-  InsertedResult,
-  InsertRating,
-  InsertResult,
-  Race,
+  Team,
   Rater,
+  GrandPrix,
+  Race,
   Rating,
   Result,
-  Team,
-} from "./types";
+  InsertResult,
+  InsertedResult,
+  InsertRating,
+} from "../types/types";
 
 export const getDrivers = async () => {
   const response = await axios.get<ApiResponse<Driver>>(

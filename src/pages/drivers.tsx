@@ -1,5 +1,5 @@
-import { useDriversQuery } from "./query-service";
-import { formatISODateTime } from "./utils/date-utils";
+import { useDriversQuery } from "../services/query-service";
+import { formatISODateTime } from "../utils/date-utils";
 
 export default function Drivers() {
   const { data: drivers, isLoading, isError } = useDriversQuery();

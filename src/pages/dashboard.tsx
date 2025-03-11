@@ -2,16 +2,16 @@ import { useMutation } from "@tanstack/react-query";
 import { usePulsy } from "pulsy";
 import { useState } from "react";
 
-import { insertRating, insertResult } from "./api-service";
-import CreateResult from "./components/create-result";
-import GrandPrixSelect from "./components/grand-prix-select";
-import RaceSelect from "./components/race-select";
+import CreateResult from "../components/create-result";
+import GrandPrixSelect from "../components/grand-prix-select";
+import RaceSelect from "../components/race-select";
+import { insertRating, insertResult } from "../services/api-service";
 import {
   useDriversQuery,
   useRatersQuery,
   useTeamsQuery,
-} from "./query-service";
-import { InsertRating } from "./types";
+} from "../services/query-service";
+import { InsertRating } from "../types/types";
 
 export default function Dashboard() {
   const [auth] = usePulsy<{ user: string }>("auth");

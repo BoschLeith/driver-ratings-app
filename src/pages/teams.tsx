@@ -1,5 +1,5 @@
-import { useTeamsQuery } from "./query-service";
-import { formatISODateTime } from "./utils/date-utils";
+import { useTeamsQuery } from "../services/query-service";
+import { formatISODateTime } from "../utils/date-utils";
 
 export default function Teams() {
   const { data: teams, isLoading, isError } = useTeamsQuery();

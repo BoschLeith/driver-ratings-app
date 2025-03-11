@@ -1,5 +1,5 @@
-import { useRatingsQuery } from "./query-service";
-import { formatISODateTime } from "./utils/date-utils";
+import { useRatingsQuery } from "../services/query-service";
+import { formatISODateTime } from "../utils/date-utils";
 
 export default function Ratings() {
   const { data: ratings, isLoading, isError } = useRatingsQuery();

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Driver, Rater, Team } from "../types";
+import { Driver, Rater, Team } from "../types/types";
 import DriverSelect from "./driver-select";
 import PositionSelect from "./position-select";
 import RatingsInput from "./ratings-input";

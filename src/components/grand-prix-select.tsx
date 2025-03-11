@@ -1,6 +1,5 @@
 import { ChangeEvent, useState } from "react";
-
-import { useGrandPrixsQuery } from "../query-service";
+import { useGrandPrixsQuery } from "../services/query-service";
 
 interface GrandPrixSelectProps {
   onGrandPrixSelect: (grandPrixId: number | null) => void;

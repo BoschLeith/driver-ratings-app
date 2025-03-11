@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 
-import { Driver } from "../types";
+import { Driver } from "../types/types";
 
 interface DriverSelectProps {
   index: number;

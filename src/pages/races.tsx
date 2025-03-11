@@ -1,5 +1,5 @@
-import { useRacesQuery } from "./query-service";
-import { formatISODate, formatISODateTime } from "./utils/date-utils";
+import { useRacesQuery } from "../services/query-service";
+import { formatISODate, formatISODateTime } from "../utils/date-utils";
 
 export default function Races() {
   const { data: races, isLoading, isError } = useRacesQuery();

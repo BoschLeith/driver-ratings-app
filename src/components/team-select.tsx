@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 
-import { Team } from "../types";
+import { Team } from "../types/types";
 
 interface TeamSelectProps {
   index: number;

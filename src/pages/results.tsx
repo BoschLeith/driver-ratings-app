@@ -1,5 +1,5 @@
-import { useResultsQuery } from "./query-service";
-import { formatISODateTime } from "./utils/date-utils";
+import { useResultsQuery } from "../services/query-service";
+import { formatISODateTime } from "../utils/date-utils";
 
 export default function Results() {
   const { data: results, isLoading, isError } = useResultsQuery();
