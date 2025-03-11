@@ -28,7 +28,7 @@ export default function Dashboard() {
   const [createResultCount, setCreateResultCount] = useState(0);
   const { drivers } = useDriversQuery();
   const { teams } = useTeamsQuery();
-  const { raters } = useRatersQuery();
+  const { data: raters } = useRatersQuery();
 
   const mutation = useMutation({
     mutationFn: insertResult,

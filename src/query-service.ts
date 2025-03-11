@@ -35,18 +35,11 @@ export const useTeamsQuery = () => {
   };
 };
 
-export const useRatersQuery = () => {
-  const { data, isLoading, isError } = useQuery({
+export const useRatersQuery = () =>
+  useQuery({
     queryKey: ["ratersData"],
     queryFn: getRaters,
   });
-
-  return {
-    raters: data,
-    isRatersLoading: isLoading,
-    isRatersError: isError,
-  };
-};
 
 export const useGrandPrixsQuery = () =>
   useQuery({
