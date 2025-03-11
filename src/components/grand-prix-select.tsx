@@ -1,15 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { ChangeEvent, useState } from "react";
 
-import { ApiResponse, GrandPrix } from "../types";
-
-const getGrandPrixs = async () => {
-  const response = await axios.get<ApiResponse<GrandPrix>>(
-    "http://localhost:8080/api/grandPrixs"
-  );
-  return response.data;
-};
+import { useGrandPrixsQuery } from "../query-service";
 
 interface GrandPrixSelectProps {
   onGrandPrixSelect: (grandPrixId: number | null) => void;
@@ -18,18 +9,10 @@ interface GrandPrixSelectProps {
 export default function GrandPrixSelect({
   onGrandPrixSelect,
 }: GrandPrixSelectProps) {
+  const { data: grandPrixs, isLoading, isError } = useGrandPrixsQuery();
   const [selectedGrandPrixId, setSelectedGrandPrixId] = useState<number | null>(
     null
   );
-
-  const {
-    data: grandPrixs,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["grandPrixsData"],
-    queryFn: getGrandPrixs,
-  });
 
   if (isLoading) {
     return <p>Loading grand prixs...</p>;
