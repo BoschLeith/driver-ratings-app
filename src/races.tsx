@@ -1,5 +1,5 @@
 import { useRacesQuery } from "./query-service";
-import { formatISODate } from "./utils/date-utils";
+import { formatISODate, formatISODateTime } from "./utils/date-utils";
 
 export default function Races() {
   const { data: races, isLoading, isError } = useRacesQuery();
@@ -34,8 +34,10 @@ export default function Races() {
               <td>{race.id}</td>
               <td>{race.grandPrixId}</td>
               <td>{formatISODate(race.date)}</td>
-              <td>{formatISODate(race.createdAt)}</td>
-              <td>{race.updatedAt ? formatISODate(race.updatedAt) : "-"}</td>
+              <td>{formatISODateTime(race.createdAt)}</td>
+              <td>
+                {race.updatedAt ? formatISODateTime(race.updatedAt) : "-"}
+              </td>
             </tr>
           ))}
         </tbody>

@@ -1,5 +1,5 @@
 import { useGrandPrixsQuery } from "./query-service";
-import { formatISODate } from "./utils/date-utils";
+import { formatISODateTime } from "./utils/date-utils";
 
 export default function GrandPrixs() {
   const { data: grandPrixs, isLoading, isError } = useGrandPrixsQuery();
@@ -32,9 +32,11 @@ export default function GrandPrixs() {
             <tr key={grandPrix.id}>
               <td>{grandPrix.id}</td>
               <td>{grandPrix.name}</td>
-              <td>{formatISODate(grandPrix.createdAt)}</td>
+              <td>{formatISODateTime(grandPrix.createdAt)}</td>
               <td>
-                {grandPrix.updatedAt ? formatISODate(grandPrix.updatedAt) : "-"}
+                {grandPrix.updatedAt
+                  ? formatISODateTime(grandPrix.updatedAt)
+                  : "-"}
               </td>
             </tr>
           ))}

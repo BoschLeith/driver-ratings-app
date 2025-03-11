@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { DateTime } from "luxon";
 import { ChangeEvent, useEffect, useState } from "react";
 
 import { ApiResponse, Race } from "../types";
+import { formatISODate } from "../utils/date-utils";
 
 const getGrandPrixRaces = async (grandPrixId: number) => {
   const response = await axios.get<ApiResponse<Race>>(
@@ -65,7 +65,7 @@ export default function RaceSelect({
         </option>
         {races?.data.map((race) => (
           <option key={race.id} value={race.id}>
-            {DateTime.fromISO(race.date).toLocaleString(DateTime.DATE_MED)}
+            {formatISODate(race.date)}
           </option>
         ))}
       </select>

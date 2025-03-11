@@ -1,5 +1,5 @@
 import { useDriversQuery } from "./query-service";
-import { formatISODate } from "./utils/date-utils";
+import { formatISODateTime } from "./utils/date-utils";
 
 export default function Drivers() {
   const { drivers, isDriversError, isDriversLoading } = useDriversQuery();
@@ -36,9 +36,9 @@ export default function Drivers() {
                 {driver.firstName} {driver.lastName}
               </td>
               <td>{driver.driverCode}</td>
-              <td>{formatISODate(driver.createdAt)}</td>
+              <td>{formatISODateTime(driver.createdAt)}</td>
               <td>
-                {driver.updatedAt ? formatISODate(driver.updatedAt) : "-"}
+                {driver.updatedAt ? formatISODateTime(driver.updatedAt) : "-"}
               </td>
             </tr>
           ))}
