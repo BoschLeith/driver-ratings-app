@@ -24,18 +24,11 @@ export const useDriversQuery = () => {
   };
 };
 
-export const useTeamsQuery = () => {
-  const { data, isLoading, isError } = useQuery({
+export const useTeamsQuery = () =>
+  useQuery({
     queryKey: ["teamsData"],
     queryFn: getTeams,
   });
-
-  return {
-    teams: data,
-    isTeamsLoading: isLoading,
-    isTeamsError: isError,
-  };
-};
 
 export const useRatersQuery = () =>
   useQuery({
