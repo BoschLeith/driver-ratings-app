@@ -2,13 +2,13 @@ import { useDriversQuery } from "./query-service";
 import { formatISODateTime } from "./utils/date-utils";
 
 export default function Drivers() {
-  const { drivers, isDriversError, isDriversLoading } = useDriversQuery();
+  const { data: drivers, isLoading, isError } = useDriversQuery();
 
-  if (isDriversLoading) {
+  if (isLoading) {
     return <div>Fetching drivers...</div>;
   }
 
-  if (isDriversError) {
+  if (isError) {
     return <div>An error occurred while fetching drivers.</div>;
   }
 

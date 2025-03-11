@@ -11,18 +11,11 @@ import {
   getTeams,
 } from "./api-service";
 
-export const useDriversQuery = () => {
-  const { data, isLoading, isError } = useQuery({
+export const useDriversQuery = () =>
+  useQuery({
     queryKey: ["driversData"],
     queryFn: getDrivers,
   });
-
-  return {
-    drivers: data,
-    isDriversLoading: isLoading,
-    isDriversError: isError,
-  };
-};
 
 export const useTeamsQuery = () =>
   useQuery({
