@@ -1,3 +1,45 @@
+import { useRacesQuery } from "./query-service";
+import { formatISODate } from "./utils/date-utils";
+
 export default function Races() {
-  return <div>Races</div>;
+  const { data: races, isLoading, isError } = useRacesQuery();
+
+  if (isLoading) {
+    return <div>Fetching races...</div>;
+  }
+
+  if (isError) {
+    return <div>An error occurred while fetching races.</div>;
+  }
+
+  if (!races || races.data.length === 0) {
+    return <div>No data found</div>;
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Grand Prix ID</th>
+            <th>Date</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {races.data.map((race) => (
+            <tr key={race.id}>
+              <td>{race.id}</td>
+              <td>{race.grandPrixId}</td>
+              <td>{formatISODate(race.date)}</td>
+              <td>{formatISODate(race.createdAt)}</td>
+              <td>{race.updatedAt ? formatISODate(race.updatedAt) : "-"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }

@@ -7,7 +7,10 @@ export interface GrandPrix {
 
 export interface Race {
   id: number;
+  grandPrixId: number;
   date: string;
+  createdAt: string;
+  updatedAt: string | null;
 }
 
 export interface Driver {

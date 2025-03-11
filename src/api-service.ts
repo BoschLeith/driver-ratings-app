@@ -8,6 +8,7 @@ import {
   InsertedResult,
   InsertRating,
   InsertResult,
+  Race,
   Rater,
   Team,
 } from "./types";
@@ -36,6 +37,13 @@ export const getRaters = async () => {
 export const getGrandPrixs = async () => {
   const response = await axios.get<ApiResponse<GrandPrix>>(
     "http://localhost:8080/api/grandPrixs"
+  );
+  return response.data;
+};
+
+export const getRaces = async () => {
+  const response = await axios.get<ApiResponse<Race>>(
+    "http://localhost:8080/api/races"
   );
   return response.data;
 };
