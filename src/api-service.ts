@@ -11,6 +11,7 @@ import {
   Race,
   Rater,
   Rating,
+  Result,
   Team,
 } from "./types";
 
@@ -59,6 +60,13 @@ export const getRaces = async () => {
 export const getRatings = async () => {
   const response = await axios.get<ApiResponse<Rating>>(
     "http://localhost:8080/api/ratings"
+  );
+  return response.data;
+};
+
+export const getResults = async () => {
+  const response = await axios.get<ApiResponse<Result>>(
+    "http://localhost:8080/api/results"
   );
   return response.data;
 };

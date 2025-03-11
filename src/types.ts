@@ -38,6 +38,16 @@ export interface Rating {
   updatedAt: string | null;
 }
 
+export interface Result {
+  id: number;
+  driverId: number;
+  teamId: number;
+  raceId: number;
+  position: number;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
 export interface Team {
   id: number;
   name: string;
