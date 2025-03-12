@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router";
+
 import { useDriversQuery } from "../services/query-service";
 import { formatISODateTime } from "../utils/date-utils";
 
 export default function Drivers() {
   const { data: drivers, isLoading, isError } = useDriversQuery();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <div>Fetching drivers...</div>;
@@ -15,6 +18,9 @@ export default function Drivers() {
   if (!drivers || drivers.data.length === 0) {
     return <div>No data found</div>;
   }
+  const handleEdit = (driverId: number) => {
+    navigate(`${driverId}/edit`);
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -26,6 +32,7 @@ export default function Drivers() {
             <th>Driver Code</th>
             <th>Created At</th>
             <th>Updated At</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -39,6 +46,11 @@ export default function Drivers() {
               <td>{formatISODateTime(driver.createdAt)}</td>
               <td>
                 {driver.updatedAt ? formatISODateTime(driver.updatedAt) : "-"}
+              </td>
+              <td>
+                <button onClick={() => handleEdit(driver.id)} className="btn">
+                  Edit
+                </button>
               </td>
             </tr>
           ))}

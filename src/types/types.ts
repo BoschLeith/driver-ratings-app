@@ -22,6 +22,12 @@ export interface Driver {
   updatedAt: string | null;
 }
 
+export interface InsertDriver {
+  firstName: string;
+  lastName: string;
+  driverCode: string;
+}
+
 export interface Rater {
   id: number;
   name: string;
@@ -76,7 +82,7 @@ export interface InsertedResult {
 
 export interface ApiResponse<T> {
   success: boolean;
-  data: T[];
+  data: T;
 }
 
 export interface ApiRating {
