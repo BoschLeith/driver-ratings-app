@@ -31,6 +31,7 @@ export default function App() {
                 <Route path="drivers">
                   <Route index element={<Drivers />} />
                   <Route path=":driverId/edit" element={<DriverForm />} />
+                  <Route path="create" element={<DriverForm />} />
                 </Route>
                 <Route path="grand-prixs">
                   <Route index element={<GrandPrixs />} />

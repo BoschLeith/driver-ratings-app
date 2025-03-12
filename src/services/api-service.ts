@@ -32,11 +32,31 @@ export const getDriverById = async (driverId: number) => {
 };
 
 export const createDriver = async (newDriver: InsertDriver) => {
-  const response = await axios.post(
-    "http://localhost:8080/api/drivers",
-    newDriver
-  );
-  return response.data;
+  try {
+    const pulsyAuth = localStorage.getItem("pulsy_auth");
+
+    if (!pulsyAuth) {
+      logout();
+      throw new Error("Authentication token not found");
+    }
+
+    const token = JSON.parse(pulsyAuth).value.token;
+
+    const response = await axios.post(
+      "http://localhost:8080/api/drivers",
+      newDriver,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating driver:", error);
+    throw error;
+  }
 };
 
 export const updateDriver = async (
