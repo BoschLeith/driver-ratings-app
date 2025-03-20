@@ -1,8 +1,12 @@
-import { useResultsByYearQuery } from "../services/query-service";
-import { ApiDriver } from "../types/types";
+import { useResultsByYearQuery } from "../../services/query-service";
+import { ApiDriver } from "../../types/types";
 
-export default function Home() {
-  const { data: races, isLoading, isError } = useResultsByYearQuery(2024);
+export default function Results({ year }: { year: string }) {
+  const {
+    data: races,
+    isLoading,
+    isError,
+  } = useResultsByYearQuery(Number(year));
 
   if (isLoading) {
     return <div>Fetching results...</div>;
@@ -26,7 +30,7 @@ export default function Home() {
 
   return (
     <>
-      <div>2024 Results</div>
+      <div>{`${year} Results`}</div>
       {races.data.map((race) => {
         const raterNames = getAllRaterNames(race.drivers);
         return (

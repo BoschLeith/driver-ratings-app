@@ -6,8 +6,8 @@ import Dashboard from "./pages/dashboard";
 import DriverForm from "./pages/driver-form";
 import Drivers from "./pages/drivers";
 import GrandPrixs from "./pages/grand-prixs";
-import Home from "./pages/home";
 import Login from "./pages/login";
+import ResultsList from "./pages/public/results-list";
 import Races from "./pages/races";
 import Raters from "./pages/raters";
 import Ratings from "./pages/ratings";
@@ -21,7 +21,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<PublicLayout />}>
-            <Route index element={<Home />} />
+            <Route index element={<ResultsList year={""} />} />
           </Route>
           <Route path="login" element={<Login />} />
           <Route element={<ProtectedRoute />}>
