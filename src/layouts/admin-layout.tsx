@@ -1,6 +1,7 @@
-import { Link, NavLink, Outlet, useNavigate } from "react-router";
+import { NavLink, Outlet, useNavigate } from "react-router";
 
 import { logout } from "../services/auth-service";
+import { House } from "lucide-react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -11,46 +12,44 @@ export default function AdminLayout() {
   };
 
   const navLinks = [
-    { path: "/dashboard/drivers", label: "Drivers" },
-    { path: "/dashboard/grand-prixs", label: "Grand Prixs" },
-    { path: "/dashboard/races", label: "Races" },
-    { path: "/dashboard/raters", label: "Raters" },
-    { path: "/dashboard/ratings", label: "Ratings" },
-    { path: "/dashboard/results", label: "Results" },
-    { path: "/dashboard/teams", label: "Teams" },
+    { path: "/dashboard", label: <House />, exact: true },
+    { path: "drivers", label: "Drivers" },
+    { path: "grand-prixs", label: "Grand Prixs" },
+    { path: "races", label: "Races" },
+    { path: "raters", label: "Raters" },
+    { path: "ratings", label: "Ratings" },
+    { path: "results", label: "Results" },
+    { path: "teams", label: "Teams" },
   ];
 
   return (
-    <>
-      <div className="navbar bg-base-100 shadow-sm">
-        <div className="flex-1">
-          <Link to="/dashboard" className="btn btn-ghost text-xl">
-            Driver Ratings
-          </Link>
-        </div>
-        <div className="flex">
-          <button className="btn" onClick={handleLogout}>
+    <div className="flex min-h-screen w-full flex-col">
+      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">
+            <NavLink to="/dashboard" className="hover:underline">
+              Dashboard
+            </NavLink>
+          </h1>
+          <button className="btn ml-auto" onClick={handleLogout}>
             Logout
           </button>
         </div>
-      </div>
-      <div
-        role="tablist"
-        className="tabs tabs-border shadow-sm flex justify-center"
-      >
-        {navLinks.map(({ path, label }) => (
-          <NavLink
-            key={path}
-            to={path}
-            className={({ isActive }) => (isActive ? "tab tab-active" : "tab")}
-          >
-            {label}
-          </NavLink>
-        ))}
-      </div>
-      <div className="container mx-auto p-4">
+        <ul className="menu menu-horizontal bg-base-200 rounded-box items-center">
+          {navLinks.map((link) => (
+            <li key={link.path}>
+              <NavLink
+                to={link.path}
+                className={({ isActive }) => (isActive ? "menu-active" : "")}
+                end={link.exact}
+              >
+                {link.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
         <Outlet />
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

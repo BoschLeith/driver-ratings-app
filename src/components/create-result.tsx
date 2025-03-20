@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
+import { Trash } from "lucide-react";
 import { Driver, Rater, Team } from "../types/types";
 import DriverSelect from "./driver-select";
 import PositionSelect from "./position-select";
 import RatingsInput from "./ratings-input";
 import TeamSelect from "./team-select";
-import { FaRegTrashCan } from "react-icons/fa6";
 
 interface CreateResultProps {
   index: number;
@@ -87,8 +87,8 @@ export default function CreateResult({
         />
       </th>
       <th>
-        <button className="btn btn-square" onClick={onDelete}>
-          <FaRegTrashCan />
+        <button className="btn btn-square btn-error" onClick={onDelete}>
+          <Trash />
         </button>
       </th>
     </tr>

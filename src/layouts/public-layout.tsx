@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import ResultsList from "../pages/public/results-list";
+import { Link } from "react-router";
 
 const tabItems = [
   { label: "2024", value: "2024" },
@@ -15,7 +16,9 @@ export default function PublicLayout() {
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <div className="flex items-center gap-4">
           <h1 className="text-3xl font-bold tracking-tight">Driver Ratings</h1>
-          <button className="btn ml-auto">Login</button>
+          <Link to={"/login"} className="btn ml-auto">
+            Login
+          </Link>
         </div>
         <div className="tabs tabs-box">
           {tabItems.map((item) => (
