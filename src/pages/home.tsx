@@ -1,49 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useResultsByYearQuery } from "../services/query-service";
+import { ApiDriver } from "../types/types";
 
-interface Rating {
-  rating: number;
-  raterName: string;
-}
+export default function Home() {
+  const { data: races, isLoading, isError } = useResultsByYearQuery(2024);
 
-interface Driver {
-  id: number;
-  driverCode: string;
-  ratings: Rating[];
-}
+  if (isLoading) {
+    return <div>Fetching results...</div>;
+  }
 
-interface Race {
-  raceId: number;
-  drivers: Driver[];
-}
+  if (isError) {
+    return <div>An error occurred while fetching results.</div>;
+  }
 
-interface ApiResponse {
-  success: boolean;
-  data: Race[];
-}
+  if (!races || races.data.length === 0) {
+    return <div>No data found</div>;
+  }
 
-const getResults = async () => {
-  const response = await axios.get<ApiResponse>(
-    "http://localhost:8080/api/races/2024/results"
-  );
-  return response.data;
-};
-
-function Home() {
-  const {
-    data: races,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["resultsData"],
-    queryFn: getResults,
-  });
-
-  if (isLoading) return <div>Fetching results...</div>;
-  if (error) return <div>An error occurred: {error.message}</div>;
-  if (!races || races.data.length === 0) return <div>No data found</div>;
-
-  const getAllRaterNames = (drivers: Driver[]): string[] => {
+  const getAllRaterNames = (drivers: ApiDriver[]): string[] => {
     const raterNames = new Set<string>();
     drivers.forEach((driver) => {
       driver.ratings.forEach((rating) => raterNames.add(rating.raterName));
@@ -92,5 +65,3 @@ function Home() {
     </>
   );
 }
-
-export default Home;

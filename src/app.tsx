@@ -1,20 +1,21 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 
-import Dashboard from "./dashboard";
-import Drivers from "./drivers";
-import GrandPrixs from "./grand-prixs";
-import Home from "./home";
 import AdminLayout from "./layouts/admin-layout";
 import PublicLayout from "./layouts/public-layout";
-import Login from "./login";
-import ProtectedRoute from "./protected-route";
-import Races from "./races";
-import Raters from "./raters";
-import Ratings from "./ratings";
-import Results from "./results";
-import Teams from "./teams";
+import Dashboard from "./pages/dashboard";
+import DriverForm from "./pages/driver-form";
+import Drivers from "./pages/drivers";
+import GrandPrixs from "./pages/grand-prixs";
+import Home from "./pages/home";
+import Login from "./pages/login";
+import Races from "./pages/races";
+import Raters from "./pages/raters";
+import Ratings from "./pages/ratings";
+import Results from "./pages/results";
+import Teams from "./pages/teams";
+import ProtectedRoute from "./utils/protected-route";
 
-function App() {
+export default function App() {
   return (
     <>
       <BrowserRouter>
@@ -29,6 +30,8 @@ function App() {
                 <Route index element={<Dashboard />} />
                 <Route path="drivers">
                   <Route index element={<Drivers />} />
+                  <Route path=":driverId/edit" element={<DriverForm />} />
+                  <Route path="create" element={<DriverForm />} />
                 </Route>
                 <Route path="grand-prixs">
                   <Route index element={<GrandPrixs />} />
@@ -56,5 +59,3 @@ function App() {
     </>
   );
 }
-
-export default App;

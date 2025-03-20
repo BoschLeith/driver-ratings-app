@@ -7,7 +7,10 @@ export interface GrandPrix {
 
 export interface Race {
   id: number;
+  grandPrixId: number;
   date: string;
+  createdAt: string;
+  updatedAt: string | null;
 }
 
 export interface Driver {
@@ -19,9 +22,34 @@ export interface Driver {
   updatedAt: string | null;
 }
 
+export interface InsertDriver {
+  firstName: string;
+  lastName: string;
+  driverCode: string;
+}
+
 export interface Rater {
   id: number;
   name: string;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface Rating {
+  id: number;
+  resultId: number;
+  raterId: number;
+  rating: number;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface Result {
+  id: number;
+  driverId: number;
+  teamId: number;
+  raceId: number;
+  position: number;
   createdAt: string;
   updatedAt: string | null;
 }
@@ -54,5 +82,22 @@ export interface InsertedResult {
 
 export interface ApiResponse<T> {
   success: boolean;
-  data: T[];
+  data: T;
+}
+
+export interface ApiRating {
+  rating: number;
+  raterName: string;
+}
+
+export interface ApiDriver {
+  id: number;
+  driverCode: string;
+  position: number;
+  ratings: ApiRating[];
+}
+
+export interface ApiRace {
+  raceId: number;
+  drivers: ApiDriver[];
 }

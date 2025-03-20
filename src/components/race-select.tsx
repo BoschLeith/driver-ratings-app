@@ -1,16 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { DateTime } from "luxon";
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { ApiResponse, Race } from "../types";
-
-const getGrandPrixRaces = async (grandPrixId: number) => {
-  const response = await axios.get<ApiResponse<Race>>(
-    `http://localhost:8080/api/grandPrixs/${grandPrixId}/races`
-  );
-  return response.data;
-};
+import { formatISODate } from "../utils/date-utils";
+import { useGrandPrixRacesQuery } from "../services/query-service";
 
 interface RaceSelectProps {
   grandPrixId: number;
@@ -21,16 +12,12 @@ export default function RaceSelect({
   grandPrixId,
   onRaceSelect,
 }: RaceSelectProps) {
-  const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
-
   const {
     data: races,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ["racesData", grandPrixId],
-    queryFn: () => getGrandPrixRaces(grandPrixId),
-  });
+  } = useGrandPrixRacesQuery(grandPrixId);
+  const [selectedRaceId, setSelectedRaceId] = useState<number | null>(null);
 
   useEffect(() => {
     setSelectedRaceId(null);
@@ -52,9 +39,10 @@ export default function RaceSelect({
   };
 
   return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">Race</legend>
+    <label className="floating-label">
+      <span>Race</span>
       <select
+        id="race-select"
         className="select"
         value={selectedRaceId || ""}
         onChange={handleChange}
@@ -64,10 +52,10 @@ export default function RaceSelect({
         </option>
         {races?.data.map((race) => (
           <option key={race.id} value={race.id}>
-            {DateTime.fromISO(race.date).toLocaleString(DateTime.DATE_MED)}
+            {formatISODate(race.date)}
           </option>
         ))}
       </select>
-    </fieldset>
+    </label>
   );
 }

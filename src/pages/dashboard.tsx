@@ -1,76 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { usePulsy } from "pulsy";
 import { useState } from "react";
 
-import { logout } from "./auth-service";
-import CreateResult from "./components/create-result";
-import GrandPrixSelect from "./components/grand-prix-select";
-import RaceSelect from "./components/race-select";
+import CreateResult from "../components/create-result";
+import GrandPrixSelect from "../components/grand-prix-select";
+import RaceSelect from "../components/race-select";
+import { insertRating, insertResult } from "../services/api-service";
 import {
-  ApiResponse,
-  InsertedResult,
-  InsertRating,
-  InsertResult,
-} from "./types";
-
-const insertResult = async (
-  data: InsertResult[]
-): Promise<ApiResponse<InsertedResult>> => {
-  try {
-    const pulsyAuth = localStorage.getItem("pulsy_auth");
-
-    if (!pulsyAuth) {
-      logout();
-      throw new Error("Authentication token not found");
-    }
-
-    const token = JSON.parse(pulsyAuth).value.token;
-
-    const response = await axios.post<ApiResponse<InsertedResult>>(
-      "http://localhost:8080/api/results",
-      { results: data },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("Error inserting result:", error);
-    throw error;
-  }
-};
-
-const insertRating = async (data: InsertRating[]) => {
-  try {
-    const pulsyAuth = localStorage.getItem("pulsy_auth");
-
-    if (!pulsyAuth) {
-      logout();
-      throw new Error("Authentication token not found");
-    }
-
-    const token = JSON.parse(pulsyAuth).value.token;
-
-    const response = await axios.post(
-      "http://localhost:8080/api/ratings",
-      { ratings: data },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("Error inserting ratings:", error);
-    throw error;
-  }
-};
+  useDriversQuery,
+  useRatersQuery,
+  useTeamsQuery,
+} from "../services/query-service";
+import { InsertRating } from "../types/types";
 
 export default function Dashboard() {
   const [auth] = usePulsy<{ user: string }>("auth");
@@ -85,6 +26,9 @@ export default function Dashboard() {
     }[]
   >([{ driverId: null, position: null, ratings: {}, teamId: null }]);
   const [createResultCount, setCreateResultCount] = useState(0);
+  const { data: drivers } = useDriversQuery();
+  const { data: teams } = useTeamsQuery();
+  const { data: raters } = useRatersQuery();
 
   const mutation = useMutation({
     mutationFn: insertResult,
@@ -159,10 +103,15 @@ export default function Dashboard() {
     setCreateResultCount(createResultCount + 1);
   };
 
+  const deleteCreateResult = (index: number) => {
+    const newResults = results.filter((_, i) => i !== index);
+    setResults(newResults);
+  };
+
   return (
     <>
       <div>
-        <h2>Welcome, {auth.user}!</h2>
+        <h2 className="pb-6">Welcome, {auth.user}!</h2>
       </div>
       <div className="flex flex-col space-y-4">
         <div className="flex space-x-4">
@@ -177,25 +126,36 @@ export default function Dashboard() {
 
         {grandPrixId && raceId && (
           <>
-            <div className="flex flex-col space-y-4">
-              {results.map((_result, index) => (
-                <CreateResult
-                  key={index}
-                  onChange={handleResultChange(index)}
-                />
-              ))}
+            <div className="overflow-x-auto">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Position</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th>Ratings</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((_result, index) => (
+                    <CreateResult
+                      key={index}
+                      index={index}
+                      onChange={handleResultChange(index)}
+                      onDelete={() => deleteCreateResult(index)}
+                      drivers={drivers ? drivers.data : []}
+                      teams={teams ? teams.data : []}
+                      raters={raters ? raters.data : []}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
             <button className="btn" onClick={addCreateResult}>
               Add Result
             </button>
           </>
         )}
-
-        <div>
-          {grandPrixId && <div>"grandPrixId": {grandPrixId}</div>}
-          {raceId && <div>"raceId": {raceId}</div>}
-          <pre>{JSON.stringify(results, null, 2)}</pre>
-        </div>
 
         <button
           className="btn"
@@ -204,6 +164,16 @@ export default function Dashboard() {
         >
           {mutation.isPending ? "Inserting..." : "Insert Data"}
         </button>
+
+        <div className="collapse collapse-arrow bg-base-100 border-base-300 border">
+          <input type="checkbox" />
+          <div className="collapse-title font-semibold">Dev Tools</div>
+          <div className="collapse-content text-sm">
+            {grandPrixId && <div>"grandPrixId": {grandPrixId}</div>}
+            {raceId && <div>"raceId": {raceId}</div>}
+            <pre>{JSON.stringify(results, null, 2)}</pre>
+          </div>
+        </div>
       </div>
     </>
   );

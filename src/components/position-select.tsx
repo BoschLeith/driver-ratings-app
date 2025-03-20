@@ -1,10 +1,12 @@
 import { ChangeEvent, useState } from "react";
 
 interface PositionSelectProps {
+  index: number;
   onPositionSelect: (position: number | null) => void;
 }
 
 export default function PositionSelect({
+  index,
   onPositionSelect,
 }: PositionSelectProps) {
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
@@ -25,18 +27,16 @@ export default function PositionSelect({
   }
 
   return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">Position</legend>
-      <select
-        className="select"
-        value={selectedPosition || ""}
-        onChange={handlePositionChange}
-      >
-        <option value="" disabled>
-          Select a position
-        </option>
-        {positionOptions}
-      </select>
-    </fieldset>
+    <select
+      id={`position-select-${index}`}
+      className="select"
+      value={selectedPosition || ""}
+      onChange={handlePositionChange}
+    >
+      <option value="" disabled>
+        Select a position
+      </option>
+      {positionOptions}
+    </select>
   );
 }
