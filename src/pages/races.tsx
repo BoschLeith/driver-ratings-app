@@ -1,10 +1,26 @@
 import { Pencil, Plus, Trash } from "lucide-react";
+import { useState } from "react";
 
+import RaceModal from "../components/race-modal";
 import { useRacesQuery } from "../services/query-service";
+import { Race } from "../types/types";
 import { formatISODate, formatISODateTime } from "../utils/date-utils";
 
 export default function Races() {
   const { data: races, isLoading, isError } = useRacesQuery();
+  const [selectedRace, setSelectedRace] = useState<Race | null>(null);
+
+  const handleCreateClick = () => {
+    setSelectedRace(null);
+    const modal = document.getElementById("race_modal") as HTMLDialogElement;
+    modal?.showModal();
+  };
+
+  const handleEditClick = (race: Race) => {
+    setSelectedRace(race);
+    const modal = document.getElementById("race_modal") as HTMLDialogElement;
+    modal?.showModal();
+  };
 
   if (isLoading) {
     return (
@@ -25,9 +41,9 @@ export default function Races() {
           <h2 className="text-2xl font-bold tracking-tight">Races</h2>
           <button
             className="btn ml-auto"
-            // onClick={() => {
-            //   handleCreateClick();
-            // }}
+            onClick={() => {
+              handleCreateClick();
+            }}
           >
             <Plus />
             Add Race
@@ -61,7 +77,7 @@ export default function Races() {
                     <td className="text-right space-x-2">
                       <button
                         className="btn btn-square"
-                        // onClick={() => handleEditClick(race)}
+                        onClick={() => handleEditClick(race)}
                       >
                         <Pencil />
                       </button>
@@ -79,6 +95,7 @@ export default function Races() {
           </div>
         )}
       </div>
+      <RaceModal race={selectedRace} />
     </div>
   );
 }

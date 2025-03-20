@@ -1,17 +1,24 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
+
 import { useGrandPrixsQuery } from "../services/query-service";
 
 interface GrandPrixSelectProps {
+  selectedGrandPrixId: number | null;
   onGrandPrixSelect: (grandPrixId: number | null) => void;
 }
 
 export default function GrandPrixSelect({
+  selectedGrandPrixId,
   onGrandPrixSelect,
 }: GrandPrixSelectProps) {
   const { data: grandPrixs, isLoading, isError } = useGrandPrixsQuery();
-  const [selectedGrandPrixId, setSelectedGrandPrixId] = useState<number | null>(
-    null
-  );
+  const [localSelectedGrandPrixId, setLocalSelectedGrandPrixId] = useState<
+    number | null
+  >(null);
+
+  useEffect(() => {
+    setLocalSelectedGrandPrixId(selectedGrandPrixId);
+  }, [selectedGrandPrixId]);
 
   if (isLoading) {
     return <p>Loading grand prixs...</p>;
@@ -23,7 +30,7 @@ export default function GrandPrixSelect({
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const grandPrixId = Number(e.target.value);
-    setSelectedGrandPrixId(grandPrixId);
+    setLocalSelectedGrandPrixId(grandPrixId);
     onGrandPrixSelect(grandPrixId);
   };
 
@@ -33,7 +40,7 @@ export default function GrandPrixSelect({
       <select
         id="grandPrix-select"
         className="select"
-        value={selectedGrandPrixId || ""}
+        value={localSelectedGrandPrixId || ""}
         onChange={handleChange}
       >
         <option value="" disabled>
