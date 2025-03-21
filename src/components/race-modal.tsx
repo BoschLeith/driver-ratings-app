@@ -1,43 +1,93 @@
 import { useEffect, useRef, useState } from "react";
 
+import { POST, PUT } from "../api/axios-instance";
 import { Race } from "../types/types";
 import GrandPrixSelect from "./grand-prix-select";
 
 interface RaceModalProps {
   race?: Race | null;
+  onRaceUpdate: (savedRace: Race) => void;
+  onRaceCreate: (savedRace: Race) => void;
 }
 
-export default function RaceModal({ race }: RaceModalProps) {
+export default function RaceModal({
+  race,
+  onRaceUpdate,
+  onRaceCreate,
+}: RaceModalProps) {
   const modalRef = useRef<HTMLDialogElement | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [grandPrixId, setGrandPrixId] = useState<number | null>(null);
-  const [raceDate, setRaceDate] = useState<string>("");
+  const [date, setDate] = useState<string>("");
 
-  const isFormValid = raceDate.trim() !== "" && grandPrixId !== null;
+  const isFormValid = date.trim() !== "" && grandPrixId !== null;
 
   useEffect(() => {
     if (race) {
       setGrandPrixId(race.grandPrixId ?? null);
-      setRaceDate(race.date ?? "");
+      setDate(race.date ?? "");
     }
   }, [race]);
 
   const resetState = () => {
     setGrandPrixId(null);
-    setRaceDate("");
+    setDate("");
   };
 
-  const handleSave = () => {
-    if (!grandPrixId || !raceDate) return;
+  const handleSave = async () => {
+    if (!grandPrixId || !date) return;
 
-    if (race) {
-      console.log("Updating race:", { ...race, grandPrixId, date: raceDate });
-      // Call update race API
-    } else {
-      console.log("Creating new race:", { grandPrixId, date: raceDate });
-      // Call create race API
+    setLoading(true);
+    setError(null);
+
+    const raceData = { grandPrixId, date };
+
+    try {
+      let savedRace: Race | null = null;
+
+      if (race) {
+        const { success, data, message } = await PUT<Race>(
+          `/races/${race.id}`,
+          raceData
+        );
+
+        if (success) {
+          savedRace = data;
+        } else {
+          setError(message);
+        }
+      } else {
+        // Create new race
+        const { success, data, message } = await POST<Race>("/races", raceData);
+
+        if (success) {
+          savedRace = data;
+        } else {
+          setError(message);
+        }
+      }
+
+      if (savedRace) {
+        resetState();
+
+        if (race) {
+          onRaceUpdate(savedRace);
+        } else {
+          onRaceCreate(savedRace);
+        }
+
+        modalRef.current?.close();
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("There was an unknown error saving the race data.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    modalRef.current?.close();
   };
 
   return (
@@ -59,10 +109,12 @@ export default function RaceModal({ race }: RaceModalProps) {
           <input
             type="date"
             className="input"
-            value={raceDate}
-            onChange={(e) => setRaceDate(e.target.value)}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
           />
         </div>
+
+        {error && <div className="text-red-500">{error}</div>}
 
         <div className="modal-action">
           <form method="dialog">
@@ -77,9 +129,9 @@ export default function RaceModal({ race }: RaceModalProps) {
               className="btn btn-primary ml-2"
               type="button"
               onClick={handleSave}
-              disabled={!isFormValid}
+              disabled={!isFormValid || loading}
             >
-              {race ? "Update" : "Save"}
+              {loading ? "Saving..." : race ? "Update" : "Save"}
             </button>
           </form>
         </div>

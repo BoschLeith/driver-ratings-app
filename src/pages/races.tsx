@@ -1,14 +1,37 @@
 import { Pencil, Plus, Trash } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { GET } from "../api/axios-instance";
 import RaceModal from "../components/race-modal";
-import { useRacesQuery } from "../services/query-service";
 import { Race } from "../types/types";
 import { formatISODate, formatISODateTime } from "../utils/date-utils";
 
 export default function Races() {
-  const { data: races, isLoading, isError } = useRacesQuery();
   const [selectedRace, setSelectedRace] = useState<Race | null>(null);
+  const [races, setRaces] = useState<Race[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const { success, data, message } = await GET<Race[]>("/races");
+        if (success) {
+          setRaces(data);
+        } else {
+          setError(message);
+        }
+      } catch (err) {
+        setError("Error fetching data");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleCreateClick = () => {
     setSelectedRace(null);
@@ -22,7 +45,20 @@ export default function Races() {
     modal?.showModal();
   };
 
-  if (isLoading) {
+  const handleRaceUpdate = (updatedRace: Race) => {
+    setRaces((prevRaces) =>
+      prevRaces
+        ? prevRaces.map((r) => (r.id === updatedRace.id ? updatedRace : r))
+        : []
+    );
+  };
+  const handleRaceCreate = (updatedRace: Race) => {
+    setRaces((prevRaces) =>
+      prevRaces ? [...prevRaces, updatedRace] : [updatedRace]
+    );
+  };
+
+  if (loading) {
     return (
       <div className="flex justify-center">
         <span className="loading loading-spinner loading-xl"></span>
@@ -30,8 +66,12 @@ export default function Races() {
     );
   }
 
-  if (isError) {
-    return <div>An error occurred while fetching races.</div>;
+  if (error) {
+    return (
+      <div className="flex justify-center items-center p-4 text-red-600">
+        <p>Error: {error}</p>
+      </div>
+    );
   }
 
   return (
@@ -39,17 +79,12 @@ export default function Races() {
       <div className="card-body">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-bold tracking-tight">Races</h2>
-          <button
-            className="btn ml-auto"
-            onClick={() => {
-              handleCreateClick();
-            }}
-          >
+          <button className="btn ml-auto" onClick={handleCreateClick}>
             <Plus />
             Add Race
           </button>
         </div>
-        {!races || races.data.length === 0 ? (
+        {!races || races.length === 0 ? (
           <p>No races available.</p>
         ) : (
           <div className="overflow-x-auto">
@@ -65,7 +100,7 @@ export default function Races() {
                 </tr>
               </thead>
               <tbody>
-                {races.data.map((race) => (
+                {races.map((race) => (
                   <tr key={race.id}>
                     <td>{race.id}</td>
                     <td>{race.grandPrixId}</td>
@@ -95,7 +130,11 @@ export default function Races() {
           </div>
         )}
       </div>
-      <RaceModal race={selectedRace} />
+      <RaceModal
+        race={selectedRace}
+        onRaceUpdate={handleRaceUpdate}
+        onRaceCreate={handleRaceCreate}
+      />
     </div>
   );
 }
