@@ -1,7 +1,8 @@
 import { Pencil, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { GET } from "../api/axios-instance";
+import { DELETE, GET } from "../api/axios-instance";
+import DeleteModal from "../components/delete-modal";
 import RaceModal from "../components/race-modal";
 import { Race } from "../types/types";
 import { formatISODate, formatISODateTime } from "../utils/date-utils";
@@ -23,8 +24,11 @@ export default function Races() {
           setError(message);
         }
       } catch (err) {
-        setError("Error fetching data");
-        console.error(err);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("There was an unknown error.");
+        }
       } finally {
         setLoading(false);
       }
@@ -45,6 +49,14 @@ export default function Races() {
     modal?.showModal();
   };
 
+  const handleDeleteClick = (race: Race) => {
+    setSelectedRace(race);
+    const modal = document.getElementById(
+      "delete_race_modal"
+    ) as HTMLDialogElement;
+    modal?.showModal();
+  };
+
   const handleRaceUpdate = (updatedRace: Race) => {
     setRaces((prevRaces) =>
       prevRaces
@@ -52,10 +64,39 @@ export default function Races() {
         : []
     );
   };
+
   const handleRaceCreate = (updatedRace: Race) => {
     setRaces((prevRaces) =>
       prevRaces ? [...prevRaces, updatedRace] : [updatedRace]
     );
+  };
+
+  const handleRaceDelete = async () => {
+    if (!selectedRace) return;
+
+    setLoading(true);
+    try {
+      const { success, data, message } = await DELETE<Race>(
+        `/races/${selectedRace.id}`
+      );
+      if (success) {
+        data
+          ? setRaces((prevRaces) =>
+              prevRaces ? prevRaces?.filter((r) => r.id !== data.id) : []
+            )
+          : null;
+      } else {
+        setError(message);
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("There was an unknown error.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -118,7 +159,7 @@ export default function Races() {
                       </button>
                       <button
                         className="btn btn-square"
-                        // onClick={() => handleDeleteClick(race)}
+                        onClick={() => handleDeleteClick(race)}
                       >
                         <Trash />
                       </button>
@@ -135,6 +176,7 @@ export default function Races() {
         onRaceUpdate={handleRaceUpdate}
         onRaceCreate={handleRaceCreate}
       />
+      <DeleteModal onConfirm={handleRaceDelete} />
     </div>
   );
 }
