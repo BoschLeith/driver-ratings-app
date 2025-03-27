@@ -1,44 +1,38 @@
-import { useRef } from "react";
-
 interface DeleteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   onConfirm: () => void;
   title?: string;
   message?: string;
 }
 
 export default function DeleteModal({
+  isOpen,
+  onClose,
   onConfirm,
   title = "Confirm Delete",
   message = "Are you sure you want to delete this item?",
 }: DeleteModalProps) {
-  const modalRef = useRef<HTMLDialogElement | null>(null);
-
-  const closeModal = () => {
-    modalRef.current?.close();
-  };
-
   return (
-    <>
-      <dialog ref={modalRef} id="delete_race_modal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">{title}</h3>
-          <p className="py-4">{message}</p>
-          <div className="modal-action">
-            <button
-              className="btn btn-error"
-              onClick={() => {
-                onConfirm();
-                closeModal();
-              }}
-            >
-              Delete
-            </button>
-            <button className="btn" onClick={closeModal}>
-              Cancel
-            </button>
-          </div>
+    <dialog className="modal" open={isOpen}>
+      <div className="modal-box">
+        <h3 className="font-bold text-lg">{title}</h3>
+        <p className="py-4">{message}</p>
+        <div className="modal-action">
+          <button
+            className="btn btn-error"
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+          >
+            Delete
+          </button>
+          <button className="btn" onClick={onClose}>
+            Cancel
+          </button>
         </div>
-      </dialog>
-    </>
+      </div>
+    </dialog>
   );
 }

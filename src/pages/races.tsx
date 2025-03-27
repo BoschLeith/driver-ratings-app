@@ -13,6 +13,9 @@ export default function Races() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [isRaceModalOpen, setIsRaceModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -24,11 +27,9 @@ export default function Races() {
           setError(message);
         }
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("There was an unknown error.");
-        }
+        setError(
+          err instanceof Error ? err.message : "There was an unknown error."
+        );
       } finally {
         setLoading(false);
       }
@@ -39,22 +40,17 @@ export default function Races() {
 
   const handleCreateClick = () => {
     setSelectedRace(null);
-    const modal = document.getElementById("race_modal") as HTMLDialogElement;
-    modal?.showModal();
+    setIsRaceModalOpen(true);
   };
 
   const handleEditClick = (race: Race) => {
     setSelectedRace(race);
-    const modal = document.getElementById("race_modal") as HTMLDialogElement;
-    modal?.showModal();
+    setIsRaceModalOpen(true);
   };
 
   const handleDeleteClick = (race: Race) => {
     setSelectedRace(race);
-    const modal = document.getElementById(
-      "delete_race_modal"
-    ) as HTMLDialogElement;
-    modal?.showModal();
+    setIsDeleteModalOpen(true);
   };
 
   const handleRaceUpdate = (updatedRace: Race) => {
@@ -65,10 +61,8 @@ export default function Races() {
     );
   };
 
-  const handleRaceCreate = (updatedRace: Race) => {
-    setRaces((prevRaces) =>
-      prevRaces ? [...prevRaces, updatedRace] : [updatedRace]
-    );
+  const handleRaceCreate = (newRace: Race) => {
+    setRaces((prevRaces) => (prevRaces ? [...prevRaces, newRace] : [newRace]));
   };
 
   const handleRaceDelete = async () => {
@@ -79,23 +73,20 @@ export default function Races() {
       const { success, data, message } = await DELETE<Race>(
         `/races/${selectedRace.id}`
       );
-      if (success) {
-        data
-          ? setRaces((prevRaces) =>
-              prevRaces ? prevRaces?.filter((r) => r.id !== data.id) : []
-            )
-          : null;
+      if (success && data) {
+        setRaces(
+          (prevRaces) => prevRaces?.filter((r) => r.id !== data.id) || []
+        );
       } else {
         setError(message);
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("There was an unknown error.");
-      }
+      setError(
+        err instanceof Error ? err.message : "There was an unknown error."
+      );
     } finally {
       setLoading(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -175,8 +166,14 @@ export default function Races() {
         race={selectedRace}
         onRaceUpdate={handleRaceUpdate}
         onRaceCreate={handleRaceCreate}
+        isOpen={isRaceModalOpen}
+        onClose={() => setIsRaceModalOpen(false)}
       />
-      <DeleteModal onConfirm={handleRaceDelete} />
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleRaceDelete}
+      />
     </div>
   );
 }
