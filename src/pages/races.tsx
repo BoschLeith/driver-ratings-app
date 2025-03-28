@@ -8,10 +8,10 @@ import { Race } from "../types/types";
 import { formatISODate, formatISODateTime } from "../utils/date-utils";
 
 export default function Races() {
-  const [selectedRace, setSelectedRace] = useState<Race | null>(null);
   const [races, setRaces] = useState<Race[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedRace, setSelectedRace] = useState<Race | null>(null);
 
   const [isRaceModalOpen, setIsRaceModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -19,16 +19,19 @@ export default function Races() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+
       try {
         const { success, data, message } = await GET<Race[]>("/races");
-        if (success) {
-          setRaces(data);
-        } else {
-          setError(message);
+
+        if (!success || !data) {
+          throw new Error(message || "Failed to fetch race data.");
         }
+
+        setRaces(data);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "There was an unknown error."
+          err instanceof Error ? err.message : "Unknown error occurred."
         );
       } finally {
         setLoading(false);
@@ -69,21 +72,20 @@ export default function Races() {
     if (!selectedRace) return;
 
     setLoading(true);
+    setError(null);
+
     try {
       const { success, data, message } = await DELETE<Race>(
         `/races/${selectedRace.id}`
       );
-      if (success && data) {
-        setRaces(
-          (prevRaces) => prevRaces?.filter((r) => r.id !== data.id) || []
-        );
-      } else {
-        setError(message);
+
+      if (!success || !data) {
+        throw new Error(message || "Failed to delete race.");
       }
+
+      setRaces((prevRaces) => prevRaces?.filter((r) => r.id !== data.id) || []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "There was an unknown error."
-      );
+      setError(err instanceof Error ? err.message : "Unknown error occurred.");
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);

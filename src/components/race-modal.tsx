@@ -37,7 +37,7 @@ export default function RaceModal({
   }, [race, isOpen]);
 
   const handleSave = async () => {
-    if (!grandPrixId || !date) return;
+    if (grandPrixId === null || date.trim() === "") return;
 
     setLoading(true);
     setError(null);
@@ -45,38 +45,16 @@ export default function RaceModal({
     const raceData = { grandPrixId, date };
 
     try {
-      let savedRace: Race | null = null;
+      const { success, data, message } = race
+        ? await PUT<Race>(`/races/${race.id}`, raceData)
+        : await POST<Race>("/races", raceData);
 
-      if (race) {
-        const { success, data, message } = await PUT<Race>(
-          `/races/${race.id}`,
-          raceData
-        );
-
-        if (success) {
-          savedRace = data;
-        } else {
-          setError(message);
-        }
-      } else {
-        const { success, data, message } = await POST<Race>("/races", raceData);
-
-        if (success) {
-          savedRace = data;
-        } else {
-          setError(message);
-        }
+      if (!success || !data) {
+        throw new Error(message || "Failed to save race data.");
       }
 
-      if (savedRace) {
-        if (race) {
-          onRaceUpdate(savedRace);
-        } else {
-          onRaceCreate(savedRace);
-        }
-
-        onClose();
-      }
+      race ? onRaceUpdate(data) : onRaceCreate(data);
+      onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error occurred.");
     } finally {
