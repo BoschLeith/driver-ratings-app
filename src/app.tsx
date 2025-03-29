@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 
 import AdminLayout from "./layouts/admin-layout";
 import PublicLayout from "./layouts/public-layout";
-import Dashboard from "./pages/dashboard";
+import Dashboard2 from "./pages/dashboard2";
 import DriverForm from "./pages/driver-form";
 import Drivers from "./pages/drivers";
 import GrandPrixs from "./pages/grand-prixs";
@@ -25,7 +25,7 @@ export default function App() {
         <Route path="login" element={<Login />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
+            <Route index element={<Dashboard2 />} />
             <Route path="drivers">
               <Route index element={<Drivers />} />
               <Route path=":driverId/edit" element={<DriverForm />} />
