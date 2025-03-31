@@ -14,7 +14,7 @@ export default function PublicLayout() {
 
   return (
     <>
-      <header className="container-fluid">
+      <header>
         <nav>
           <ul>
             <li>
@@ -41,8 +41,10 @@ export default function PublicLayout() {
           </ul>
         </nav>
       </header>
-      <main className="container">
-        <ResultsList year={selectedYear} />
+      <main>
+        <section>
+          <ResultsList year={selectedYear} />
+        </section>
       </main>
     </>
   );

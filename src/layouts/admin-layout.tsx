@@ -1,7 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router";
 
 import { logout } from "../services/auth-service";
-import { House } from "lucide-react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -12,7 +11,7 @@ export default function AdminLayout() {
   };
 
   const navLinks = [
-    { path: "/dashboard", label: <House />, exact: true },
+    { path: "/dashboard", label: "Dashboard", exact: true },
     { path: "drivers", label: "Drivers" },
     { path: "grand-prixs", label: "Grand Prixs" },
     { path: "races", label: "Races" },
@@ -23,33 +22,41 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-        <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">
-            <NavLink to="/dashboard" className="hover:underline">
-              Dashboard
-            </NavLink>
-          </h1>
-          <button className="btn ml-auto" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-        <ul className="menu menu-horizontal bg-base-200 rounded-box items-center">
-          {navLinks.map((link) => (
-            <li key={link.path}>
-              <NavLink
-                to={link.path}
-                className={({ isActive }) => (isActive ? "menu-active" : "")}
-                end={link.exact}
-              >
-                {link.label}
-              </NavLink>
+    <>
+      <header>
+        <nav>
+          <ul>
+            <li>
+              <strong>Driver Ratings</strong>
             </li>
-          ))}
-        </ul>
-        <Outlet />
+          </ul>
+          <ul>
+            <li>
+              <button onClick={handleLogout}>Logout</button>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main>
+        <nav className="overflow-auto">
+          <ul>
+            {navLinks.map(({ path, label, exact }) => (
+              <li key={path}>
+                <NavLink
+                  to={path}
+                  end={exact}
+                  className={({ isActive }) => (!isActive ? "secondary" : "")}
+                >
+                  {label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <section>
+          <Outlet />
+        </section>
       </main>
-    </div>
+    </>
   );
 }
