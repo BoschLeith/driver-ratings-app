@@ -1,63 +1,68 @@
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { login } from "../services/auth-service";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    const success = await login(username, password);
-    if (!success) {
-      setError("Invalid credentials. Try again.");
-    } else {
-      navigate("/dashboard");
+    try {
+      const success = await login(formData.email, formData.password);
+      if (!success) {
+        setError("Invalid credentials. Try again.");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="card w-[350px]">
-        <div className="card-body">
-          <h2 className="card-title">Login</h2>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <label className="floating-label" htmlFor="email">
-              <span>Email</span>
+    <section className="login-wrapper">
+      <div>
+        <h2>Login</h2>
+        <form onSubmit={handleLogin}>
+          <fieldset>
+            <label htmlFor="email">
+              Email
               <input
-                className="input"
                 id="email"
                 type="email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email"
                 required
                 autoComplete="email"
               />
             </label>
-            <label className="floating-label" htmlFor="password">
-              <span>Password</span>
+            <label htmlFor="password">
+              Password
               <input
-                className="input"
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="Password"
                 required
                 autoComplete="current-password"
               />
             </label>
-            <button className="btn btn-block" type="submit">
-              Login
-            </button>
-          </form>
-          {error && <p className="text-error">{error}</p>}
-        </div>
+          </fieldset>
+          <button type="submit">Login</button>
+        </form>
+        {error && <small>{error}</small>}
       </div>
-    </div>
+    </section>
   );
 }

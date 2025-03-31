@@ -3,3 +3,11 @@
 .mb-0 {
   margin-bottom: 0 !important;
 }
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
